@@ -34,6 +34,7 @@ function Test-GetColumnWidths {
     Test @( 1, 2, 3 )             2 @( 2, 3 )
     Test @( 1, 2, 3, 4, 5 )       3 @( 2, 4, 5 )
     Test @( 1, 2, 3, 4, 5, 6, 7 ) 3 @( 3, 6, 7 )
+    Test @( 1, 15 )               1 @( 15 )
 }
 
 function Test-GetBestFittingColumns {
@@ -51,6 +52,7 @@ function Test-GetBestFittingColumns {
     Test @( 4, 4 )          @( 4, 4 )
     Test @( 4, 4, 4)        @( 4, 4)
     Test @( 1, 1, 1, 1, 8 ) @( 1, 8 )
+    Test @( 2, 15 )         @( 15 )
 }
 
 Test-GetColumnWidths

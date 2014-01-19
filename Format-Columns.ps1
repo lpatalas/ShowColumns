@@ -48,7 +48,7 @@ function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
     $columnWidths = $itemWidths
     $foundBestFit = $false
 
-    while ((-not $foundBestFit) -and ($columnCount -gt 1)) {
+    while ((-not $foundBestFit) -and ($columnCount -gt 0)) {
         $columnWidths = Get-ColumnWidths $itemWidths $columnCount
         $totalWidth = (Sum-Array($columnWidths)) + ($spacing * ($columnCount - 1))
 
@@ -85,7 +85,8 @@ function Write-Name($item) {
 }
 
 function Write-Columns($items, $itemWidths, $spacing) {
-    $columnWidths = Get-BestFittingColumns $itemWidths $spacing $Host.UI.RawUI.BufferSize.Width
+    $bufferWidth = $Host.UI.RawUI.BufferSize.Width
+    $columnWidths = @(Get-BestFittingColumns $itemWidths $spacing $bufferWidth)
     $countPerColumn = Get-ItemCountPerColumn $items.Length $columnWidths.Length
     $columnCount = $columnWidths.Length
 
@@ -94,7 +95,6 @@ function Write-Columns($items, $itemWidths, $spacing) {
             $itemIndex = $columnIndex * $countPerColumn + $rowIndex
             $item = $items[$itemIndex]
             $columnWidth = $columnWidths[$columnIndex]
-            $padding = $columnWidth - $itemWidths[$itemIndex]
 
             if ($itemIndex -lt $items.Length) {
                 if ($columnIndex -gt 0) {
@@ -102,7 +102,11 @@ function Write-Columns($items, $itemWidths, $spacing) {
                 }
 
                 Write-Name $item
-                Write-Spaces $padding
+
+                if ($columnIndex -lt ($columnCount - 1)) {
+                    $padding = $columnWidth - $itemWidths[$itemIndex]
+                    Write-Spaces $padding
+                }
             }
         }
 
