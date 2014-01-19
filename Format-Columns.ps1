@@ -23,6 +23,8 @@ function New-RegexColorRule {
     return New-ColorRule $predicate $foregroundColor $backgroundColor
 }
 
+$defaultRule = New-ColorRule { $false } 'White' 'Black'
+
 $colorRules = @(
     New-ColorRule { $args[0].PSIsContainer } 'Blue'
     New-RegexColorRule '\.(bat|cmd|exe|msi|ps1)$' 'Green'
@@ -30,16 +32,15 @@ $colorRules = @(
     New-RegexColorRule '\.(bmp|gif|jpg|jpeg|png|psd|tiff)$' 'Magenta'
 )
 
-function Get-Color($item) {
+function Get-ColorRule($item) {
     foreach ($rule in $colorRules) {
         if (Invoke-Command -ScriptBlock $rule.Predicate -Args $item) {
-            return $rule.ForegroundColor
+            return $rule
         }
     }
 
-    return 'White'
+    return $defaultRule
 }
-
 
 function Sum-Array($items) {
     return ($items | Measure-Object -Sum).Sum
@@ -99,10 +100,11 @@ function Write-Spaces($count) {
 }
 
 function Write-Name($item) {
-    $color = Get-Color $item
-    Write-Host $item.Name -NoNewLine -ForegroundColor:$color
+    $rule = Get-ColorRule $item
+
+    Write-Host $item.Name -NoNewLine -ForegroundColor:$rule.ForegroundColor -BackgroundColor:$rule.BackgroundColor
     if ($item.PSIsContainer) {
-        Write-Host "/" -NoNewLine
+        Write-Host "/" -NoNewLine -ForegroundColor:$rule.ForegroundColor -BackgroundColor:$rule.BackgroundColor
     }
 }
 
