@@ -1,3 +1,46 @@
+function New-ColorRule {
+    param(
+        [ScriptBlock] $predicate,
+        [ConsoleColor] $foregroundColor,
+        [ConsoleColor] $backgroundColor = 'Black'
+    )
+
+    $rule = New-Object PSObject
+    $rule | Add-Member NoteProperty Predicate $predicate
+    $rule | Add-Member NoteProperty BackgroundColor $backgroundColor
+    $rule | Add-Member NoteProperty ForegroundColor $ForegroundColor
+    return $rule
+}
+
+function New-RegexColorRule {
+    param(
+        [string] $Pattern,
+        [ConsoleColor] $foregroundColor,
+        [ConsoleColor] $backgroundColor = 'Black'
+    )
+
+    $predicate = { param($item) $item.Name -match $Pattern }.GetNewClosure()
+    return New-ColorRule $predicate $foregroundColor $backgroundColor
+}
+
+$colorRules = @(
+    New-ColorRule { $args[0].PSIsContainer } 'Blue'
+    New-RegexColorRule '\.(bat|cmd|exe|msi|ps1)$' 'Green'
+    New-RegexColorRule '\.(7z|iso|gz|rar|tar|zip)$' 'Red'
+    New-RegexColorRule '\.(bmp|gif|jpg|jpeg|png|psd|tiff)$' 'Magenta'
+)
+
+function Get-Color($item) {
+    foreach ($rule in $colorRules) {
+        if (Invoke-Command -ScriptBlock $rule.Predicate -Args $item) {
+            return $rule.ForegroundColor
+        }
+    }
+
+    return 'White'
+}
+
+
 function Sum-Array($items) {
     return ($items | Measure-Object -Sum).Sum
 }
@@ -56,7 +99,8 @@ function Write-Spaces($count) {
 }
 
 function Write-Name($item) {
-    Write-Host $item.Name -NoNewLine
+    $color = Get-Color $item
+    Write-Host $item.Name -NoNewLine -ForegroundColor:$color
     if ($item.PSIsContainer) {
         Write-Host "/" -NoNewLine
     }
