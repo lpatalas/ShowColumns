@@ -63,10 +63,6 @@ function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
     return $columnWidths
 }
 
-function Get-Widths($items) {
-    return $items | %{ $_.Width }
-}
-
 function Write-Spaces($count) {
     Write-Host (' ' * $count) -NoNewLine
 }
