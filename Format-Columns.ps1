@@ -119,15 +119,6 @@ function Write-Columns($items, $itemWidths, $spacing) {
     }
 }
 
-function New-ListItem($name, $foregroundColor, $backgroundColor) {
-    $item = New-Object PSObject
-    $item | Add-Member NoteProperty Name $name
-    $item | Add-Member NoteProperty Width $name.Length
-    $item | Add-Member NoteProperty ForegroundColor $foregroundColor
-    $item | Add-Member NoteProperty BackgroundColor $backgroundColor
-    return $item
-}
-
 function Format-Columns {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
