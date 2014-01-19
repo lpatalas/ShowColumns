@@ -68,7 +68,7 @@ function Write-Spaces($count) {
 }
 
 function Write-Name($item, $maxWidth) {
-    $name = $item.Name
+    $name = $item.PSChildName
 
     if ($name.Length -gt $maxWidth) {
         $name = $name.Substring(0, $maxWidth - 4) + '...'
@@ -79,7 +79,7 @@ function Write-Name($item, $maxWidth) {
         $color = $FolderColor
     }
     else {
-        $ext = [IO.Path]::GetExtension($item.Name).ToLower()
+        $ext = [IO.Path]::GetExtension($item.PSChildName).ToLower()
         $color = $colorRules[$ext]
         if (-not $color) {
             $color = 'White'
@@ -141,7 +141,7 @@ function Format-Columns {
 
     process {
         $items += $InputObject
-        $width = $InputObject.Name.Length
+        $width = $InputObject.PSChildName.Length
         if ($InputObject.PSIsContainer) {
             $width += 1
         }
