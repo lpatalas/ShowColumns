@@ -1,49 +1,27 @@
-function New-ColorRule {
-    param(
-        [ScriptBlock] $predicate,
-        [ConsoleColor] $foregroundColor,
-        [ConsoleColor] $backgroundColor = 'Black'
-    )
 
-    $rule = New-Object PSObject
-    $rule | Add-Member NoteProperty Predicate $predicate
-    $rule | Add-Member NoteProperty BackgroundColor $backgroundColor
-    $rule | Add-Member NoteProperty ForegroundColor $ForegroundColor
-    return $rule
-}
-
-function New-RegexColorRule {
-    param(
-        [string] $Pattern,
-        [ConsoleColor] $foregroundColor,
-        [ConsoleColor] $backgroundColor = 'Black'
-    )
-
-    $predicate = { param($item) $item.Name -match $Pattern }.GetNewClosure()
-    return New-ColorRule $predicate $foregroundColor $backgroundColor
-}
-
-$defaultRule = New-ColorRule { $false } 'White' 'Black'
-
-$colorRules = @(
-    New-ColorRule { $args[0].PSIsContainer } 'Blue'
-    New-RegexColorRule '\.(bat|cmd|exe|msi|ps1)$' 'Green'
-    New-RegexColorRule '\.(7z|iso|gz|rar|tar|zip)$' 'Red'
-    New-RegexColorRule '\.(bmp|gif|jpg|jpeg|png|psd|tiff)$' 'Magenta'
-)
-
-function Get-ColorRule($item) {
-    foreach ($rule in $colorRules) {
-        if (Invoke-Command -ScriptBlock $rule.Predicate -Args $item) {
-            return $rule
+function Assign-Color($color, $extensions) {
+    foreach ($ext in $extensions) {
+        if ($ext[0] -ne '.') {
+            $ext = '.' + $ext
         }
-    }
 
-    return $defaultRule
+        $colorRules[$ext] = $color
+    }
 }
+
+$colorRules = @{}
+$FolderColor = 'Blue'
+Assign-Color 'Green' @('bat', 'cmd', 'exe', 'msi')
+Assign-Color 'Magenta' @('bmp', 'gif', 'jpg', 'jpeg', 'pdn', 'png', 'psd', 'raw', 'tiff')
+Assign-Color 'Red' @('7z', 'cab', 'gz', 'iso', 'rar', 'tar', 'zip')
 
 function Sum-Array($items) {
-    return ($items | Measure-Object -Sum).Sum
+    $sum = 0
+    $count = $items.Length
+    for ($i = 0; $i -lt $count; $i++) {
+        $sum += $items[$i]
+    }
+    return $sum
 }
 
 function Get-CountPerColumn($itemCount, $columnCount) {
@@ -53,8 +31,9 @@ function Get-CountPerColumn($itemCount, $columnCount) {
 function Get-ColumnWidths($itemWidths, $columnCount) {
     $countPerColumn = Get-CountPerColumn $itemWidths.Length $columnCount
     $columnWidths = @(0) * $columnCount
+    $itemCount = $itemWidths.Length
 
-    for ($index = 0; $index -lt $itemWidths.Length; $index++) {
+    for ($index = 0; $index -lt $itemCount; $index++) {
         $columnIndex = [Math]::Floor($index / $countPerColumn)
         if ($columnWidths[$columnIndex] -lt $itemWidths[$index]) {
             $columnWidths[$columnIndex] = $itemWidths[$index]
@@ -85,7 +64,7 @@ function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
 }
 
 function Get-Widths($items) {
-    $items | %{ $_.Width }
+    return $items | %{ $_.Width }
 }
 
 function Write-Spaces($count) {
@@ -93,16 +72,29 @@ function Write-Spaces($count) {
 }
 
 function Write-Name($item) {
-    Write-Host $item.Name -NoNewLine -ForegroundColor:$item.ForegroundColor -BackgroundColor:$item.BackgroundColor
+    if ($item.PSIsContainer) {
+        $name = $item.Name + '/'
+        $color = $FolderColor
+    }
+    else {
+        $name = $item.Name
+        $ext = [IO.Path]::GetExtension($item.Name).ToLower()
+        $color = $colorRules[$ext]
+        if (-not $color) {
+            $color = 'White'
+        }
+    }
+
+    Write-Host $name -NoNewLine -ForegroundColor:$color
 }
 
-function Write-Columns($items, $spacing) {
-    $itemWidths = Get-Widths $items
+function Write-Columns($items, $itemWidths, $spacing) {
     $columnWidths = Get-BestFittingColumns $itemWidths $spacing $Host.UI.RawUI.BufferSize.Width
     $countPerColumn = Get-CountPerColumn $items.Length $columnWidths.Length
+    $columnCount = $columnWidths.Length
 
     for ($rowIndex = 0; $rowIndex -lt $countPerColumn; $rowIndex++) {
-        for ($columnIndex = 0; $columnIndex -lt $columnWidths.Length; $columnIndex++) {
+        for ($columnIndex = 0; $columnIndex -lt $columnCount; $columnIndex++) {
             $itemIndex = $columnIndex * $countPerColumn + $rowIndex
             $item = $items[$itemIndex]
             $columnWidth = $columnWidths[$columnIndex]
@@ -139,19 +131,19 @@ function Format-Columns {
 
     begin {
         $items = @()
+        $itemWidths = @()
     }
 
     process {
-        $name = $InputObject.Name
+        $items += $InputObject
+        $width = $InputObject.Name.Length
         if ($InputObject.PSIsContainer) {
-            $name += '/'
+            $width += 1
         }
-        $colorRule = Get-ColorRule $InputObject
-
-        $items += New-ListItem $name $colorRule.ForegroundColor $colorRule.BackgroundColor
+        $itemWidths += $width
     }
 
     end {
-        Write-Columns $items 1
+        Write-Columns $items $itemWidths 1
     }
 }
