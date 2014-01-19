@@ -85,14 +85,7 @@ function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
 }
 
 function Get-Widths($items) {
-    $items | ForEach-Object {
-        if ($_.PSIsContainer) {
-            $_.Name.Length + 1
-        }
-        else {
-            $_.Name.Length
-        }
-    }
+    $items | %{ $_.Width }
 }
 
 function Write-Spaces($count) {
@@ -100,12 +93,7 @@ function Write-Spaces($count) {
 }
 
 function Write-Name($item) {
-    $rule = Get-ColorRule $item
-
-    Write-Host $item.Name -NoNewLine -ForegroundColor:$rule.ForegroundColor -BackgroundColor:$rule.BackgroundColor
-    if ($item.PSIsContainer) {
-        Write-Host "/" -NoNewLine -ForegroundColor:$rule.ForegroundColor -BackgroundColor:$rule.BackgroundColor
-    }
+    Write-Host $item.Name -NoNewLine -ForegroundColor:$item.ForegroundColor -BackgroundColor:$item.BackgroundColor
 }
 
 function Write-Columns($items, $spacing) {
@@ -134,6 +122,15 @@ function Write-Columns($items, $spacing) {
     }
 }
 
+function New-ListItem($name, $foregroundColor, $backgroundColor) {
+    $item = New-Object PSObject
+    $item | Add-Member NoteProperty Name $name
+    $item | Add-Member NoteProperty Width $name.Length
+    $item | Add-Member NoteProperty ForegroundColor $foregroundColor
+    $item | Add-Member NoteProperty BackgroundColor $backgroundColor
+    return $item
+}
+
 function Format-Columns {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -141,14 +138,20 @@ function Format-Columns {
     )
 
     begin {
-        $pipedObjects = @()
+        $items = @()
     }
 
     process {
-        $pipedObjects += $InputObject
+        $name = $InputObject.Name
+        if ($InputObject.PSIsContainer) {
+            $name += '/'
+        }
+        $colorRule = Get-ColorRule $InputObject
+
+        $items += New-ListItem $name $colorRule.ForegroundColor $colorRule.BackgroundColor
     }
 
     end {
-        Write-Columns $pipedObjects 1
+        Write-Columns $items 1
     }
 }
