@@ -56,4 +56,9 @@ function Test-GetBestFittingColumns {
 Test-GetColumnWidths
 Test-GetBestFittingColumns
 
+Write-Host "Measure Get-BestFittingColumns"
+$widths = Get-ChildItem 'C:\' | %{ $_.Name.Length }
+Measure-Command { Get-BestFittingColumns $widths 1 $Host.UI.RawUI.BufferSize.Width }
+
+Write-Host "Measure Format-Columns"
 Measure-Command { Get-ChildItem "C:\" | Format-Columns }
