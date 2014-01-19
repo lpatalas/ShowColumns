@@ -42,7 +42,7 @@ function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
 
 function Get-Widths($items) {
     $items | ForEach-Object {
-        if ($_.IsPsContainer) {
+        if ($_.PSIsContainer) {
             $_.Name.Length + 1
         }
         else {
@@ -57,8 +57,8 @@ function Write-Spaces($count) {
 
 function Write-Name($item) {
     Write-Host $item.Name -NoNewLine
-    if ($item.IsPsContainer) {
-        Write-Host "\" -NoNewLine
+    if ($item.PSIsContainer) {
+        Write-Host "/" -NoNewLine
     }
 }
 
