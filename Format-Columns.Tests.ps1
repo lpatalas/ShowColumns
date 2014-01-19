@@ -56,4 +56,4 @@ function Test-GetBestFittingColumns {
 Test-GetColumnWidths
 Test-GetBestFittingColumns
 
-Get-ChildItem "C:\" | Format-Columns
+Measure-Command { Get-ChildItem "C:\" | Format-Columns }
