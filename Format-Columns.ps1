@@ -24,12 +24,12 @@ function Sum-Array($items) {
     return $sum
 }
 
-function Get-CountPerColumn($itemCount, $columnCount) {
-    return [Math]::Floor(($itemWidths.Length + $columnCount - 1) / $columnCount)
+function Get-ItemCountPerColumn($totalItemCount, $columnCount) {
+    return [Math]::Floor(($totalItemCount + $columnCount - 1) / $columnCount)
 }
 
 function Get-ColumnWidths($itemWidths, $columnCount) {
-    $countPerColumn = Get-CountPerColumn $itemWidths.Length $columnCount
+    $countPerColumn = Get-ItemCountPerColumn $itemWidths.Length $columnCount
     $columnWidths = @(0) * $columnCount
     $itemCount = $itemWidths.Length
 
@@ -86,7 +86,7 @@ function Write-Name($item) {
 
 function Write-Columns($items, $itemWidths, $spacing) {
     $columnWidths = Get-BestFittingColumns $itemWidths $spacing $Host.UI.RawUI.BufferSize.Width
-    $countPerColumn = Get-CountPerColumn $items.Length $columnWidths.Length
+    $countPerColumn = Get-ItemCountPerColumn $items.Length $columnWidths.Length
     $columnCount = $columnWidths.Length
 
     for ($rowIndex = 0; $rowIndex -lt $countPerColumn; $rowIndex++) {
