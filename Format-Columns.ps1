@@ -140,6 +140,8 @@ function Format-Columns {
     }
 
     end {
+        Write-Host
         Write-Columns $items $itemWidths 1
+        Write-Host
     }
 }
