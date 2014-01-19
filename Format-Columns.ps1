@@ -67,13 +67,18 @@ function Write-Spaces($count) {
     Write-Host (' ' * $count) -NoNewLine
 }
 
-function Write-Name($item) {
+function Write-Name($item, $maxWidth) {
+    $name = $item.Name
+
+    if ($name.Length -gt $maxWidth) {
+        $name = $name.Substring(0, $maxWidth - 4) + '...'
+    }
+
     if ($item.PSIsContainer) {
-        $name = $item.Name + '/'
+        $name += '/'
         $color = $FolderColor
     }
     else {
-        $name = $item.Name
         $ext = [IO.Path]::GetExtension($item.Name).ToLower()
         $color = $colorRules[$ext]
         if (-not $color) {
@@ -101,7 +106,7 @@ function Write-Columns($items, $itemWidths, $spacing) {
                     Write-Spaces $spacing
                 }
 
-                Write-Name $item
+                Write-Name $item $bufferWidth
 
                 if ($columnIndex -lt ($columnCount - 1)) {
                     $padding = $columnWidth - $itemWidths[$itemIndex]
