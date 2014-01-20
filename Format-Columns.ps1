@@ -99,7 +99,7 @@ function Get-ItemColor($item) {
         }
     }
 
-    return $color;
+    return $color
 }
 
 function Write-Name($item, $maxWidth) {
