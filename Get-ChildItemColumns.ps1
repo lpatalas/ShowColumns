@@ -3,8 +3,12 @@ function Get-ChildItemColumns {
     [CmdletBinding(DefaultParameterSetName = "Items")]
     param(
         [String[]] $Exclude,
+
+        [Parameter(Position = 1)]
         [String] $Filter,
+
         [switch] $Force,
+
         [String[]] $Include,
 
         [Parameter(Mandatory = $true, ParameterSetName = "LiteralItems")]
