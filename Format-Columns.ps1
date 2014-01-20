@@ -144,6 +144,20 @@ function Write-Columns($items, $itemWidths, $spacing) {
     }
 }
 
+function Show-Items($items, $widths, $directoryPath = "") {
+    if ($items) {
+        Write-Host
+
+        if ($directoryPath) {
+            $displayPath = (Convert-Path $directoryPath)
+            Write-Host "$displayPath\" -ForegroundColor DarkGray
+        }
+
+        Write-Columns $items $widths 1
+    }
+
+}
+
 function Format-Columns {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -177,13 +191,7 @@ function Format-Columns {
                 $item = $items[$i]
 
                 if ($item.PSParentPath -ne $currentDir) {
-                    if ($dirItems) {
-                        $displayPath = (Convert-Path $currentDir)
-
-                        Write-Host
-                        Write-Host "$displayPath\" -ForegroundColor DarkGray
-                        Write-Columns $dirItems $dirWidths 1
-                    }
+                    Show-Items $dirItems $dirWidths $currentDir
 
                     $currentDir = $item.PSParentPath
                     $dirItems = @()
@@ -193,6 +201,8 @@ function Format-Columns {
                 $dirItems += $item
                 $dirWidths += $itemWidths[$i]
             }
+
+            Show-Items $dirItems $dirWidths $currentDir
         }
         else {
             Write-Host
