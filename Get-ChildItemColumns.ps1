@@ -15,8 +15,10 @@ function Get-ChildItemColumns {
         [String[]] $LiteralPath,
 
         [Parameter(ParameterSetName = "Items", Position = 0)]
-        [String[]] $Path
+        [String[]] $Path,
+
+        [switch] $Recurse
     )
 
-    Get-ChildItem @PSBoundParameters | Format-Columns
+    Get-ChildItem @PSBoundParameters | Format-Columns -GroupByDirectory:$Recurse
 }
