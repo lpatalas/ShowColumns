@@ -11,6 +11,8 @@ function Assign-Color($color, $extensions) {
 
 $colorRules = @{}
 $FolderColor = 'Blue'
+$HiddenBackground = 'DarkGray'
+$HiddenForeground = 'White'
 Assign-Color 'Green' @('bat', 'cmd', 'exe', 'msi')
 Assign-Color 'Magenta' @('bmp', 'gif', 'jpg', 'jpeg', 'pdn', 'png', 'psd', 'raw', 'tiff')
 Assign-Color 'Red' @('7z', 'cab', 'gz', 'iso', 'rar', 'tar', 'zip')
@@ -70,7 +72,7 @@ function Write-Spaces($count) {
     Write-Host (' ' * $count) -NoNewLine
 }
 
-function Write-Name($item, $maxWidth) {
+function Get-ItemName($item, $maxWidth) {
     $name = $item.PSChildName
 
     if ($name.Length -gt $maxWidth) {
@@ -81,6 +83,14 @@ function Write-Name($item, $maxWidth) {
         $name += '/'
         $color = $FolderColor
     }
+
+    return $name
+}
+
+function Get-ItemColor($item) {
+    if ($item.PSIsContainer) {
+        $color = $FolderColor
+    }
     else {
         $ext = [IO.Path]::GetExtension($item.PSChildName).ToLower()
         $color = $colorRules[$ext]
@@ -89,7 +99,19 @@ function Write-Name($item, $maxWidth) {
         }
     }
 
-    Write-Host $name -NoNewLine -ForegroundColor:$color
+    return $color;
+}
+
+function Write-Name($item, $maxWidth) {
+    $name = Get-ItemName $item $maxWidth
+
+    if ($item.Attributes -match 'Hidden') {
+        Write-Host $name -NoNewLine -ForegroundColor:$HiddenForeground -BackgroundColor:$HiddenBackground
+    }
+    else {
+        $color = Get-ItemColor $item
+        Write-Host $name -NoNewLine -ForegroundColor:$color
+    }
 }
 
 function Write-Columns($items, $itemWidths, $spacing) {
