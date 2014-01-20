@@ -14,6 +14,9 @@ $FolderColor = 'Blue'
 Assign-Color 'Green' @('bat', 'cmd', 'exe', 'msi')
 Assign-Color 'Magenta' @('bmp', 'gif', 'jpg', 'jpeg', 'pdn', 'png', 'psd', 'raw', 'tiff')
 Assign-Color 'Red' @('7z', 'cab', 'gz', 'iso', 'rar', 'tar', 'zip')
+Assign-Color 'Yellow' @('c', 'cpp', 'cs', 'css', 'cxx', 'fs', 'h', 'hpp', 'hs', 'htm', 'html', 'java', 'js', 'ps1', 'psm1', 'py', 'sql', 'vb', 'xml', 'xsl')
+Assign-Color 'Cyan' @('csproj', 'sln', 'vbproj', 'vsproj', 'vsxproj')
+Assign-Color 'DarkGray' @('.gitattributes', '.gitignore', '.gitmodules', '.hgignore', '.hgtags')
 
 function Sum-Array($items) {
     $sum = 0
