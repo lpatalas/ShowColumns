@@ -155,7 +155,30 @@ function Show-Items($items, $widths, $directoryPath = "") {
 
         Write-Columns $items $widths 1
     }
+}
 
+function Show-GroupedItems($items, $itemWidths) {
+    $dirItems = @()
+    $dirWidths = @()
+    $currentDir = ""
+    $itemCount = $items.Length
+
+    for ($i = 0; $i -lt $itemCount; $i++) {
+        $item = $items[$i]
+
+        if ($item.PSParentPath -ne $currentDir) {
+            Show-Items $dirItems $dirWidths $currentDir
+
+            $currentDir = $item.PSParentPath
+            $dirItems = @()
+            $dirWidths = @()
+        }
+
+        $dirItems += $item
+        $dirWidths += $itemWidths[$i]
+    }
+
+    Show-Items $dirItems $dirWidths $currentDir
 }
 
 function Format-Columns {
@@ -182,27 +205,7 @@ function Format-Columns {
 
     end {
         if ($GroupByDirectory) {
-            $dirItems = @()
-            $dirWidths = @()
-            $currentDir = ""
-            $itemCount = $items.Length
-
-            for ($i = 0; $i -lt $itemCount; $i++) {
-                $item = $items[$i]
-
-                if ($item.PSParentPath -ne $currentDir) {
-                    Show-Items $dirItems $dirWidths $currentDir
-
-                    $currentDir = $item.PSParentPath
-                    $dirItems = @()
-                    $dirWidths = @()
-                }
-
-                $dirItems += $item
-                $dirWidths += $itemWidths[$i]
-            }
-
-            Show-Items $dirItems $dirWidths $currentDir
+            Show-GroupedItems $items $itemWidths
         }
         else {
             Write-Host
