@@ -211,8 +211,9 @@ function Format-Columns {
             else {
                 Write-Host
                 Write-Columns $items $itemWidths 1
-                Write-Host
             }
+            
+            Write-Host
         }
     }
 }
