@@ -28,6 +28,7 @@ function Test-GetColumnWidths {
         Assert-CollectionsEqual $expected $actual
     }
 
+    Test @()                      0 @()
     Test @( 4 )                   1 @( 4 )
     Test @( 4, 8 )                1 @( 8 )
     Test @( 4, 8, 3, 5 )          2 @( 8, 5 )
