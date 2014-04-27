@@ -50,7 +50,7 @@ function Prepare-TestData {
 
 function Test($description, $script) {
     Write-Host "--- Testing $description" -ForegroundColor DarkYellow
-    $measurements = Measure-Command { $script.Invoke() | Out-Default }
+    $measurements = Measure-Command { $script.Invoke() }
     Write-Host "--- Total time $($measurements.TotalMilliseconds) msec" -ForegroundColor DarkYellow
     Write-Host
 }
