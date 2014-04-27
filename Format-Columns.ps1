@@ -124,7 +124,7 @@ function Get-ItemWidths($items) {
     }
 }
 
-function Write-Columns($items, $spacing) {
+function Write-Columns($items, $spacing = 1) {
     $itemWidths = @( Get-ItemWidths $items )
     $bufferWidth = $Host.UI.RawUI.BufferSize.Width
     $columnWidths = @(Get-BestFittingColumns $itemWidths $spacing $bufferWidth)
@@ -192,7 +192,7 @@ function Show-GroupedItems($items) {
         }
 
         Write-Host "$path\" -ForegroundColor DarkGray
-        Write-Columns $group.Items 1
+        Write-Columns $group.Items
     }
 }
 
@@ -218,7 +218,7 @@ function Format-Columns {
                 Show-GroupedItems $items
             }
             else {
-                Write-Columns $items 1
+                Write-Columns $items
             }
         }
     }
