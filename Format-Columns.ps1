@@ -156,6 +156,7 @@ function Write-Columns($items, $spacing) {
 }
 
 function Show-Items($items, $directoryPath = "") {
+    $items = @( $items )
     if ($items) {
         Write-Host
 
@@ -168,31 +169,37 @@ function Show-Items($items, $directoryPath = "") {
     }
 }
 
-function Show-GroupedItems($items) {
-    $dirItems = @()
-    $currentDir = ""
-    $itemCount = $items.Length
+function New-Group($name, $order) {
+    $group = New-Object PSObject
+    $group | Add-Member NoteProperty Name $name
+    $group | Add-Member NoteProperty Order $order
+    $group | Add-Member NoteProperty Items @()
+    $group
+}
 
-    # $groupedItems = $item | Group-Object { $_.PSParentPath }
+function Group-ItemsByParentPath($items) {
+    $groups = @{}
+    $nextGroupOrder = 1
 
-    # foreach ($group in $groupedItems) {
-    #     Show-Items $group.Group 
-    # }
-
-    for ($i = 0; $i -lt $itemCount; $i++) {
-        $item = $items[$i]
-
-        if ($item.PSParentPath -ne $currentDir) {
-            Show-Items $dirItems $currentDir
-
-            $currentDir = $item.PSParentPath
-            $dirItems = @()
+    foreach ($item in $items) {
+        $group = $groups[$item.PSParentPath]
+        if (-not $group) {
+            $group = New-Group $item.PSParentPath $nextGroupOrder
+            $groups.Add($item.PSParentPath, $group)
+            $nextGroupOrder++
         }
 
-        $dirItems += $item
+        $group.Items += @( $item )
     }
 
-    Show-Items $dirItems $dirWidths $currentDir
+    return $groups.Values | Sort-Object Order
+}
+
+function Show-GroupedItems($items) {
+    $groupedItems = Group-ItemsByParentPath $items
+    foreach ($group in $groupedItems) {
+        Show-Items $group.Items $group.Name
+    }
 }
 
 function Format-Columns {

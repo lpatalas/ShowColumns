@@ -72,5 +72,5 @@ Test 'listing folder contents recursively grouped by directory' {
 }
 
 Test 'listing folder contents recursively, sorted in descending order and grouped by directory' {
-    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Sort-Object -Descending | Format-Columns -GroupByDirectory
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Sort-Object Name -Descending | Format-Columns -GroupByDirectory
 }
