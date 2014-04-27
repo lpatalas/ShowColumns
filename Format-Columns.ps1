@@ -206,22 +206,14 @@ function Format-Columns {
         [switch] $GroupByDirectory
     )
 
-    begin {
-        $items = @()
-    }
+    $items = @( $input )
 
-    process {
-        $items += $InputObject
-    }
-
-    end {
-        if ($items) {
-            if ($GroupByDirectory) {
-                Show-GroupedItems $items
-            }
-            else {
-                Write-Columns $items
-            }
+    if ($items) {
+        if ($GroupByDirectory) {
+            Show-GroupedItems $items
+        }
+        else {
+            Write-Columns $items
         }
     }
 }
