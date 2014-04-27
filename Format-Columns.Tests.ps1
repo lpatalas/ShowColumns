@@ -36,6 +36,16 @@ function Prepare-TestData {
 
     Create-Directory "$TestsDir\Columns"
     Generate-Files "$TestsDir\Columns" -count 100 -prefix test
+
+    $consoleWidth = $Host.UI.RawUI.BufferSize.Width
+    $leftLength = [Math]::Floor(($consoleWidth - 1) / 2)
+    $rightLength = $consoleWidth - $leftLength - 1
+
+    Create-Directory "$TestsDir\FitWidth"
+    Create-File (Join-Path "$TestsDir\FitWidth" ('a' * $leftLength))
+    Create-File (Join-Path "$TestsDir\FitWidth" ('b' * $leftLength))
+    Create-File (Join-Path "$TestsDir\FitWidth" ('c' * $rightLength))
+    Create-File (Join-Path "$TestsDir\FitWidth" ('d' * $rightLength))
 }
 
 function Test($description, $script) {
@@ -73,4 +83,8 @@ Test 'listing folder contents recursively grouped by directory' {
 
 Test 'listing folder contents recursively, sorted in descending order and grouped by directory' {
     Get-ChildItem "$TestsDir\Subfolders" -Recurse | Sort-Object Name -Descending | Format-Columns -GroupByDirectory
+}
+
+Test 'displaying items fitting console width exactly' {
+    Get-ChildItem "$TestsDir\FitWidth" | Format-Columns
 }

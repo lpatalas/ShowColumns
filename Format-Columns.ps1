@@ -151,7 +151,9 @@ function Write-Columns($items, $spacing = 1) {
             }
         }
 
-        Write-Host
+        if ($Host.UI.RawUI.CursorPosition.X -gt 0) {
+            Write-Host
+        }
     }
 }
 
