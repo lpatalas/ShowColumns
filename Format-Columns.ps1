@@ -183,9 +183,14 @@ function Group-ItemsByParentPath($items) {
 
 function Show-GroupedItems($items) {
     $groupedItems = Group-ItemsByParentPath $items
+
     foreach ($group in $groupedItems) {
         $path = Convert-Path $group.Name
-        Write-Host
+
+        if ($group.Order -gt 1) {
+            Write-Host
+        }
+
         Write-Host "$path\" -ForegroundColor DarkGray
         Write-Columns $group.Items 1
     }
