@@ -1,67 +1,69 @@
 $CurrentDir = (Split-Path $MyInvocation.MyCommand.Definition)
+$TestsDir = (Join-Path $CurrentDir 'TestData')
 
 . "$CurrentDir\Format-Columns.ps1"
 
-function Assert-CollectionsEqual($expected, $actual) {
-    function Write-Failure($additionalInfo = $null) {
-        Write-Host "Failed - expected { $expected } but found { $actual }. $additionalInfo" -ForegroundColor Red
+function Clear-Directory($path) {
+    Remove-Item (Join-Path $path '*') -Force -Recurse
+}
+
+function Create-Directory($path) {
+    New-Item $path -ItemType Directory | Out-Null
+}
+
+function Create-File($path) {
+    New-Item $path -ItemType File | Out-Null
+}
+
+function Generate-Files($directoryPath, $count = 3) {
+    1..$count | %{ Create-File (Join-Path $directoryPath "$_.txt") }
+}
+
+function Prepare-TestData {
+    if (-not (Test-Path $TestsDir)) {
+        Create-Directory $TestsDir
     }
 
-    if ($expected.Length -ne $actual.Length) {
-        Write-Failure "Sizes do not match $($expected.Length) != $($actual.Count)"
-        return
-    }
+    Clear-Directory $TestsDir
+    Create-Directory "$TestsDir\Empty"
+    Create-Directory "$TestsDir\Subfolders"
+    Generate-Files "$TestsDir\Subfolders"
 
-    for ($i = 0; $i -lt $expected.Length; $i++) {
-        if ($expected[$i] -ne $actual[$i]) {
-            Write-Failure "Items at index $i differ"
-            break
-        }
+    foreach ($folderNumber in 1..3) {
+        Create-Directory "$TestsDir\Subfolders\$folderNumber"
+        Generate-Files "$TestsDir\Subfolders\$folderNumber"
     }
 }
 
-function Test-GetColumnWidths {
-    Write-Host "Testing Get-ColumnWidths..."
-
-    function Test($widths, $columnCount, $expected) {
-        $actual = @(Get-ColumnWidths $widths $columnCount)
-        Assert-CollectionsEqual $expected $actual
-    }
-
-    Test @()                      0 @()
-    Test @( 4 )                   1 @( 4 )
-    Test @( 4, 8 )                1 @( 8 )
-    Test @( 4, 8, 3, 5 )          2 @( 8, 5 )
-    Test @( 1, 2, 3 )             2 @( 2, 3 )
-    Test @( 1, 2, 3, 4, 5 )       3 @( 2, 4, 5 )
-    Test @( 1, 2, 3, 4, 5, 6, 7 ) 3 @( 3, 6, 7 )
-    Test @( 1, 15 )               1 @( 15 )
+function Test($description, $script) {
+    Write-Host "--- Testing $description" -ForegroundColor DarkYellow
+    $measurements = Measure-Command { $script.Invoke() | Out-Default }
+    Write-Host "--- Total time $($measurements.TotalMilliseconds) msec" -ForegroundColor DarkYellow
+    Write-Host
 }
 
-function Test-GetBestFittingColumns {
-    Write-Host "Testing Get-BestFittingColumns..."
+Prepare-TestData
 
-    $spacing = 1
-    $availableWidth = 10
-
-    function Test($widths, $expected) {
-        $actual = @(Get-BestFittingColumns $widths $spacing $availableWidth)
-        Assert-CollectionsEqual $expected $actual
-    }
-
-    Test @( 4 )             @( 4 )
-    Test @( 4, 4 )          @( 4, 4 )
-    Test @( 4, 4, 4)        @( 4, 4)
-    Test @( 1, 1, 1, 1, 8 ) @( 1, 8 )
-    Test @( 2, 15 )         @( 15 )
+Test 'empty directory' {
+    Get-ChildItem "$TestsDir\Empty" | Format-Columns
 }
 
-Test-GetColumnWidths
-Test-GetBestFittingColumns
+Test 'listing folder contents non-recursively' {
+    Get-ChildItem "$TestsDir\Subfolders" | Format-Columns
+}
 
-Write-Host "Measure Get-BestFittingColumns"
-$widths = Get-ChildItem 'C:\' | %{ $_.Name.Length }
-Measure-Command { Get-BestFittingColumns $widths 1 $Host.UI.RawUI.BufferSize.Width }
+Test 'listing folder contents non-recursively in reverse order' {
+    Get-ChildItem "$TestsDir\Subfolders" | Sort-Object -Descending | Format-Columns
+}
 
-Write-Host "Measure Format-Columns"
-Measure-Command { Get-ChildItem "C:\" | Format-Columns }
+Test 'listing folder contents recursively' {
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Format-Columns
+}
+
+Test 'listing folder contents recursively grouped by directory' {
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Format-Columns -GroupByDirectory
+}
+
+Test 'listing folder contents recursively, sorted in descending order and grouped by directory' {
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Sort-Object -Descending | Format-Columns -GroupByDirectory
+}
