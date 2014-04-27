@@ -114,7 +114,18 @@ function Write-Name($item, $maxWidth) {
     }
 }
 
-function Write-Columns($items, $itemWidths, $spacing) {
+function Get-ItemWidths($items) {
+    return $items | %{ 
+        $width = $_.PSChildName.Length
+        if ($_.PSIsContainer) {
+            $width += 1
+        }
+        $width
+    }
+}
+
+function Write-Columns($items, $spacing) {
+    $itemWidths = @( Get-ItemWidths $items )
     $bufferWidth = $Host.UI.RawUI.BufferSize.Width
     $columnWidths = @(Get-BestFittingColumns $itemWidths $spacing $bufferWidth)
     $countPerColumn = Get-ItemCountPerColumn $items.Length $columnWidths.Length
@@ -144,7 +155,7 @@ function Write-Columns($items, $itemWidths, $spacing) {
     }
 }
 
-function Show-Items($items, $widths, $directoryPath = "") {
+function Show-Items($items, $directoryPath = "") {
     if ($items) {
         Write-Host
 
@@ -153,29 +164,32 @@ function Show-Items($items, $widths, $directoryPath = "") {
             Write-Host "$displayPath\" -ForegroundColor DarkGray
         }
 
-        Write-Columns $items $widths 1
+        Write-Columns $items 1
     }
 }
 
-function Show-GroupedItems($items, $itemWidths) {
+function Show-GroupedItems($items) {
     $dirItems = @()
-    $dirWidths = @()
     $currentDir = ""
     $itemCount = $items.Length
+
+    # $groupedItems = $item | Group-Object { $_.PSParentPath }
+
+    # foreach ($group in $groupedItems) {
+    #     Show-Items $group.Group 
+    # }
 
     for ($i = 0; $i -lt $itemCount; $i++) {
         $item = $items[$i]
 
         if ($item.PSParentPath -ne $currentDir) {
-            Show-Items $dirItems $dirWidths $currentDir
+            Show-Items $dirItems $currentDir
 
             $currentDir = $item.PSParentPath
             $dirItems = @()
-            $dirWidths = @()
         }
 
         $dirItems += $item
-        $dirWidths += $itemWidths[$i]
     }
 
     Show-Items $dirItems $dirWidths $currentDir
@@ -191,25 +205,19 @@ function Format-Columns {
 
     begin {
         $items = @()
-        $itemWidths = @()
     }
 
     process {
         $items += $InputObject
-        $width = $InputObject.PSChildName.Length
-        if ($InputObject.PSIsContainer) {
-            $width += 1
-        }
-        $itemWidths += $width
     }
 
     end {
         if ($items) {
             if ($GroupByDirectory) {
-                Show-GroupedItems $items $itemWidths
+                Show-GroupedItems $items
             }
             else {
-                Write-Columns $items $itemWidths 1
+                Write-Columns $items 1
             }
         }
     }
