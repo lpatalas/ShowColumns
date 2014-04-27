@@ -155,20 +155,6 @@ function Write-Columns($items, $spacing) {
     }
 }
 
-function Show-Items($items, $directoryPath = "") {
-    $items = @( $items )
-    if ($items) {
-        Write-Host
-
-        if ($directoryPath) {
-            $displayPath = (Convert-Path $directoryPath)
-            Write-Host "$displayPath\" -ForegroundColor DarkGray
-        }
-
-        Write-Columns $items 1
-    }
-}
-
 function New-Group($name, $order) {
     $group = New-Object PSObject
     $group | Add-Member NoteProperty Name $name
@@ -198,7 +184,10 @@ function Group-ItemsByParentPath($items) {
 function Show-GroupedItems($items) {
     $groupedItems = Group-ItemsByParentPath $items
     foreach ($group in $groupedItems) {
-        Show-Items $group.Items $group.Name
+        $path = Convert-Path $group.Name
+        Write-Host
+        Write-Host "$path\" -ForegroundColor DarkGray
+        Write-Columns $group.Items 1
     }
 }
 
