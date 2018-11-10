@@ -165,15 +165,28 @@ function New-Group($name, $order) {
     $group
 }
 
-function Group-ItemsByParentPath($items) {
+function GetGroupName($item, $groupByPropertyName) {
+    $groupName = $item.$groupByPropertyName
+
+    # TODO: Find if there is a way to remove
+    #       this special case
+    if (($groupByPropertyName -ieq 'PSParentPath') -or ($groupByPropertyName -ieq 'PSPath')) {
+        $groupName = Convert-Path $groupName
+    }
+
+    return $groupName
+}
+
+function Group-ItemsByExpression($items, $groupByPropertyName) {
     $groups = @{}
     $nextGroupOrder = 1
 
     foreach ($item in $items) {
-        $group = $groups[$item.PSParentPath]
+        $groupName = GetGroupName $item $groupByPropertyName
+        $group = $groups[$groupName]
         if (-not $group) {
-            $group = New-Group $item.PSParentPath $nextGroupOrder
-            $groups.Add($item.PSParentPath, $group)
+            $group = New-Group $groupName $nextGroupOrder
+            $groups.Add($groupName, $group)
             $nextGroupOrder++
         }
 
@@ -183,17 +196,17 @@ function Group-ItemsByParentPath($items) {
     return $groups.Values | Sort-Object Order
 }
 
-function Show-GroupedItems($items) {
-    $groupedItems = Group-ItemsByParentPath $items
+function Show-GroupedItems($items, $groupByPropertyName) {
+    $groupedItems = Group-ItemsByExpression $items $groupByPropertyName
 
     foreach ($group in $groupedItems) {
-        $path = Convert-Path $group.Name
+        $path = $group.Name
 
         if ($group.Order -gt 1) {
             Write-Host
         }
 
-        Write-Host "$path\" -ForegroundColor DarkGray
+        Write-Host $path -ForegroundColor DarkGray
         Write-Columns $group.Items
     }
 }
@@ -203,14 +216,14 @@ function Format-Columns {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [Object] $InputObject,
 
-        [switch] $GroupByDirectory
+        [String] $GroupBy
     )
 
     $items = @( $input )
 
     if ($items) {
-        if ($GroupByDirectory) {
-            Show-GroupedItems $items
+        if ($GroupBy) {
+            Show-GroupedItems $items $GroupBy
         }
         else {
             Write-Columns $items

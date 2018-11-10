@@ -78,13 +78,42 @@ Test 'listing folder contents recursively' {
 }
 
 Test 'listing folder contents recursively grouped by directory' {
-    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Format-Columns -GroupByDirectory
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
+        | Format-Columns -GroupBy PSParentPath
 }
 
 Test 'listing folder contents recursively, sorted in descending order and grouped by directory' {
-    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Sort-Object Name -Descending | Format-Columns -GroupByDirectory
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
+        | Sort-Object Name -Descending `
+        | Format-Columns -GroupBy PSParentPath
 }
 
 Test 'displaying items fitting console width exactly' {
     Get-ChildItem "$TestsDir\FitWidth" | Format-Columns
+}
+
+Test 'displaying custom items grouped by arbitrary property' {
+    function NewItem($name, $groupName) {
+        return [PSCustomObject] @{
+            PSChildName = $name
+            GroupName = $groupName
+        }
+    }
+
+    $items = @(
+        NewItem 'First' 'Group1'
+        NewItem 'Second' 'Group2'
+        NewItem 'Third' 'Group1'
+        NewItem 'Fourth' 'Group2'
+        NewItem 'Fifth' 'Group3'
+        NewItem 'Sixth' 'Group3'
+        NewItem 'Seventh' 'Group1'
+        NewItem 'Eighth' 'Group2'
+        NewItem 'Ninth' 'Group1'
+        NewItem 'Tenth' 'Group2'
+        NewItem 'Eleventh' 'Group3'
+        NewItem 'Twelveth' 'Group3'
+    )
+
+    $items | Format-Columns -GroupBy GroupName
 }

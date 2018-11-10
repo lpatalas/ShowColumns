@@ -20,5 +20,11 @@ function Get-ChildItemColumns {
         [switch] $Recurse
     )
 
-    Get-ChildItem @PSBoundParameters | Format-Columns -GroupByDirectory:$Recurse
+    if ($Recurse) {
+        Get-ChildItem @PSBoundParameters `
+            | Format-Columns -GroupByDirectory:$Recurse
+    }
+    else {
+        Get-ChildItem @PSBoundParameters | Format-Columns
+    }
 }
