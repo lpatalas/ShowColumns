@@ -199,14 +199,26 @@ function Show-GroupedItems($items) {
     }
 }
 
+function GetItemName($item, $propertyName) {
+    if ($propertyName) {
+        return $item.$propertyName
+    }
+    elseif ($item.PSChildName) {
+        # HACK: Special casing for provider items
+        return $item.PSChildName
+    }
+    else {
+        return $item.ToString()
+    }
+}
+
 function GetGroupName($item, $groupByPropertyName) {
     $groupName = $null
 
     if ($groupByPropertyName) {
         $groupName = $item.$groupByPropertyName
 
-        # TODO: Find if there is a way to remove
-        #       this special case
+        # HACK: Special casing for provider items
         if (($groupByPropertyName -ieq 'PSParentPath') -or ($groupByPropertyName -ieq 'PSPath')) {
             $groupName = Convert-Path $groupName
         }
@@ -220,13 +232,15 @@ function Format-Columns {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [Object] $InputObject,
 
+        [String] $Property,
+
         [String] $GroupBy
     )
 
     $items = @( $input ) `
         | ForEach-Object {
             [PSCustomObject] @{
-                Name = $_.PSChildName
+                Name = GetItemName $_ $Property
                 GroupName = GetGroupName $_ $GroupBy
             }
         }

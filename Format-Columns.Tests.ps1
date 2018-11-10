@@ -95,9 +95,43 @@ Test 'displaying items fitting console width exactly' {
 Test 'displaying custom items grouped by arbitrary property' {
     function NewItem($name, $groupName) {
         return [PSCustomObject] @{
-            PSChildName = $name
+            Name = $name
             GroupName = $groupName
         }
+    }
+
+    $items = @(
+        NewItem 'First' 'Group1'
+        NewItem 'Second' 'Group2'
+        NewItem 'Third' 'Group1'
+        NewItem 'Fourth' 'Group2'
+        NewItem 'Fifth' 'Group3'
+        NewItem 'Sixth' 'Group3'
+        NewItem 'Seventh' 'Group1'
+        NewItem 'Eighth' 'Group2'
+        NewItem 'Ninth' 'Group1'
+        NewItem 'Tenth' 'Group2'
+        NewItem 'Eleventh' 'Group3'
+        NewItem 'Twelveth' 'Group3'
+    )
+
+    $items | Format-Columns -GroupBy GroupName -Property Name
+}
+
+Test 'when name property is not specified then items should be converted to strings' {
+    function NewItem($name, $groupName) {
+        $item = [PSCustomObject] @{
+            CustomProperty = $name
+            GroupName = $groupName
+        }
+        $item | Add-Member `
+            -MemberType ScriptMethod `
+            -Name 'ToString' `
+            -Force `
+            -Value {
+                $this.CustomProperty
+            }
+        return $item
     }
 
     $items = @(
