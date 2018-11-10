@@ -73,7 +73,7 @@ function Write-Spaces($count) {
 }
 
 function Get-ItemName($item, $maxWidth) {
-    $name = $item.PSChildName
+    $name = $item.Name
 
     if ($name.Length -gt $maxWidth) {
         $name = $name.Substring(0, $maxWidth - 4) + '...'
@@ -92,7 +92,7 @@ function Get-ItemColor($item) {
         $color = $FolderColor
     }
     else {
-        $ext = [IO.Path]::GetExtension($item.PSChildName).ToLower()
+        $ext = [IO.Path]::GetExtension($item.Name).ToLower()
         $color = $colorRules[$ext]
         if (-not $color) {
             $color = 'White'
@@ -116,7 +116,7 @@ function Write-Name($item, $maxWidth) {
 
 function Get-ItemWidths($items) {
     return $items | %{ 
-        $width = $_.PSChildName.Length
+        $width = $_.Name.Length
         if ($_.PSIsContainer) {
             $width += 1
         }
@@ -165,24 +165,12 @@ function New-Group($name, $order) {
     $group
 }
 
-function GetGroupName($item, $groupByPropertyName) {
-    $groupName = $item.$groupByPropertyName
-
-    # TODO: Find if there is a way to remove
-    #       this special case
-    if (($groupByPropertyName -ieq 'PSParentPath') -or ($groupByPropertyName -ieq 'PSPath')) {
-        $groupName = Convert-Path $groupName
-    }
-
-    return $groupName
-}
-
-function Group-ItemsByExpression($items, $groupByPropertyName) {
+function Group-Items($items) {
     $groups = @{}
     $nextGroupOrder = 1
 
     foreach ($item in $items) {
-        $groupName = GetGroupName $item $groupByPropertyName
+        $groupName = $item.GroupName
         $group = $groups[$groupName]
         if (-not $group) {
             $group = New-Group $groupName $nextGroupOrder
@@ -196,8 +184,8 @@ function Group-ItemsByExpression($items, $groupByPropertyName) {
     return $groups.Values | Sort-Object Order
 }
 
-function Show-GroupedItems($items, $groupByPropertyName) {
-    $groupedItems = Group-ItemsByExpression $items $groupByPropertyName
+function Show-GroupedItems($items) {
+    $groupedItems = Group-Items $items
 
     foreach ($group in $groupedItems) {
         $path = $group.Name
@@ -211,6 +199,22 @@ function Show-GroupedItems($items, $groupByPropertyName) {
     }
 }
 
+function GetGroupName($item, $groupByPropertyName) {
+    $groupName = $null
+
+    if ($groupByPropertyName) {
+        $groupName = $item.$groupByPropertyName
+
+        # TODO: Find if there is a way to remove
+        #       this special case
+        if (($groupByPropertyName -ieq 'PSParentPath') -or ($groupByPropertyName -ieq 'PSPath')) {
+            $groupName = Convert-Path $groupName
+        }
+    }
+
+    return $groupName
+}
+
 function Format-Columns {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
@@ -219,11 +223,17 @@ function Format-Columns {
         [String] $GroupBy
     )
 
-    $items = @( $input )
+    $items = @( $input ) `
+        | ForEach-Object {
+            [PSCustomObject] @{
+                Name = $_.PSChildName
+                GroupName = GetGroupName $_ $GroupBy
+            }
+        }
 
     if ($items) {
         if ($GroupBy) {
-            Show-GroupedItems $items $GroupBy
+            Show-GroupedItems $items
         }
         else {
             Write-Columns $items
