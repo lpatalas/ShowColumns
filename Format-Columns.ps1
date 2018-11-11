@@ -1,5 +1,5 @@
 
-function Assign-Color($color, $extensions) {
+function AssignColor($color, $extensions) {
     foreach ($ext in $extensions) {
         if ($ext[0] -ne '.') {
             $ext = '.' + $ext
@@ -13,14 +13,14 @@ $colorRules = @{}
 $FolderColor = 'Blue'
 $HiddenBackground = 'DarkGray'
 $HiddenForeground = 'White'
-Assign-Color 'Green' @('bat', 'cmd', 'exe', 'msi')
-Assign-Color 'Magenta' @('bmp', 'gif', 'jpg', 'jpeg', 'pdn', 'png', 'psd', 'raw', 'tiff')
-Assign-Color 'Red' @('7z', 'cab', 'gz', 'iso', 'rar', 'tar', 'zip')
-Assign-Color 'Yellow' @('c', 'cpp', 'cs', 'css', 'cxx', 'fs', 'h', 'hpp', 'hs', 'htm', 'html', 'java', 'js', 'ps1', 'psm1', 'py', 'sql', 'vb', 'xml', 'xsl')
-Assign-Color 'Cyan' @('csproj', 'sln', 'vbproj', 'vsproj', 'vsxproj')
-Assign-Color 'DarkGray' @('.gitattributes', '.gitignore', '.gitmodules', '.hgignore', '.hgtags')
+AssignColor 'Green' @('bat', 'cmd', 'exe', 'msi')
+AssignColor 'Magenta' @('bmp', 'gif', 'jpg', 'jpeg', 'pdn', 'png', 'psd', 'raw', 'tiff')
+AssignColor 'Red' @('7z', 'cab', 'gz', 'iso', 'rar', 'tar', 'zip')
+AssignColor 'Yellow' @('c', 'cpp', 'cs', 'css', 'cxx', 'fs', 'h', 'hpp', 'hs', 'htm', 'html', 'java', 'js', 'ps1', 'psm1', 'py', 'sql', 'vb', 'xml', 'xsl')
+AssignColor 'Cyan' @('csproj', 'sln', 'vbproj', 'vsproj', 'vsxproj')
+AssignColor 'DarkGray' @('.gitattributes', '.gitignore', '.gitmodules', '.hgignore', '.hgtags')
 
-function Sum-Array($items) {
+function SumArray($items) {
     $sum = 0
     $count = $items.Length
     for ($i = 0; $i -lt $count; $i++) {
@@ -29,12 +29,12 @@ function Sum-Array($items) {
     return $sum
 }
 
-function Get-ItemCountPerColumn($totalItemCount, $columnCount) {
+function GetItemCountPerColumn($totalItemCount, $columnCount) {
     return [Math]::Floor(($totalItemCount + $columnCount - 1) / $columnCount)
 }
 
-function Get-ColumnWidths($itemWidths, $columnCount) {
-    $countPerColumn = Get-ItemCountPerColumn $itemWidths.Length $columnCount
+function GetColumnWidths($itemWidths, $columnCount) {
+    $countPerColumn = GetItemCountPerColumn $itemWidths.Length $columnCount
     $columnWidths = @(0) * $columnCount
     $itemCount = $itemWidths.Length
 
@@ -48,14 +48,14 @@ function Get-ColumnWidths($itemWidths, $columnCount) {
     return $columnWidths
 }
 
-function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
+function GetBestFittingColumns($itemWidths, $spacing, $availableWidth) {
     $columnCount = $itemWidths.Length
     $columnWidths = $itemWidths
     $foundBestFit = $false
 
     while ((-not $foundBestFit) -and ($columnCount -gt 0)) {
-        $columnWidths = Get-ColumnWidths $itemWidths $columnCount
-        $totalWidth = (Sum-Array($columnWidths)) + ($spacing * ($columnCount - 1))
+        $columnWidths = GetColumnWidths $itemWidths $columnCount
+        $totalWidth = (SumArray($columnWidths)) + ($spacing * ($columnCount - 1))
 
         if ($totalWidth -le $availableWidth) {
             $foundBestFit = $true
@@ -68,11 +68,11 @@ function Get-BestFittingColumns($itemWidths, $spacing, $availableWidth) {
     return $columnWidths
 }
 
-function Write-Spaces($count) {
+function WriteSpaces($count) {
     Write-Host (' ' * $count) -NoNewLine
 }
 
-function Get-ItemName($item, $maxWidth) {
+function DecorateItemName($item, $maxWidth) {
     $name = $item.Name
 
     if ($name.Length -gt $maxWidth) {
@@ -81,13 +81,12 @@ function Get-ItemName($item, $maxWidth) {
 
     if ($item.PSIsContainer) {
         $name += '/'
-        $color = $FolderColor
     }
 
     return $name
 }
 
-function Get-ItemColor($item) {
+function GetItemColor($item) {
     if ($item.PSIsContainer) {
         $color = $FolderColor
     }
@@ -102,20 +101,20 @@ function Get-ItemColor($item) {
     return $color
 }
 
-function Write-Name($item, $maxWidth) {
-    $name = Get-ItemName $item $maxWidth
+function WriteName($item, $maxWidth) {
+    $name = DecorateItemName $item $maxWidth
 
     if ($item.Attributes -match 'Hidden') {
         Write-Host $name -NoNewLine -ForegroundColor:$HiddenForeground -BackgroundColor:$HiddenBackground
     }
     else {
-        $color = Get-ItemColor $item
+        $color = GetItemColor $item
         Write-Host $name -NoNewLine -ForegroundColor:$color
     }
 }
 
-function Get-ItemWidths($items) {
-    return $items | %{ 
+function GetItemWidths($items) {
+    return $items | ForEach-Object {
         $width = $_.Name.Length
         if ($_.PSIsContainer) {
             $width += 1
@@ -124,11 +123,11 @@ function Get-ItemWidths($items) {
     }
 }
 
-function Write-Columns($items, $spacing = 1) {
-    $itemWidths = @( Get-ItemWidths $items )
+function WriteColumns($items, $spacing = 1) {
+    $itemWidths = @( GetItemWidths $items )
     $bufferWidth = $Host.UI.RawUI.BufferSize.Width
-    $columnWidths = @(Get-BestFittingColumns $itemWidths $spacing $bufferWidth)
-    $countPerColumn = Get-ItemCountPerColumn $items.Length $columnWidths.Length
+    $columnWidths = @(GetBestFittingColumns $itemWidths $spacing $bufferWidth)
+    $countPerColumn = GetItemCountPerColumn $items.Length $columnWidths.Length
     $columnCount = $columnWidths.Length
 
     for ($rowIndex = 0; $rowIndex -lt $countPerColumn; $rowIndex++) {
@@ -139,14 +138,14 @@ function Write-Columns($items, $spacing = 1) {
 
             if ($itemIndex -lt $items.Length) {
                 if ($columnIndex -gt 0) {
-                    Write-Spaces $spacing
+                    WriteSpaces $spacing
                 }
 
-                Write-Name $item $bufferWidth
+                WriteName $item $bufferWidth
 
                 if ($columnIndex -lt ($columnCount - 1)) {
                     $padding = $columnWidth - $itemWidths[$itemIndex]
-                    Write-Spaces $padding
+                    WriteSpaces $padding
                 }
             }
         }
@@ -157,7 +156,7 @@ function Write-Columns($items, $spacing = 1) {
     }
 }
 
-function New-Group($name, $order) {
+function CreateGroup($name, $order) {
     $group = New-Object PSObject
     $group | Add-Member NoteProperty Name $name
     $group | Add-Member NoteProperty Order $order
@@ -165,7 +164,7 @@ function New-Group($name, $order) {
     $group
 }
 
-function Group-Items($items) {
+function GroupItems($items) {
     $groups = @{}
     $nextGroupOrder = 1
 
@@ -173,7 +172,7 @@ function Group-Items($items) {
         $groupName = $item.GroupName
         $group = $groups[$groupName]
         if (-not $group) {
-            $group = New-Group $groupName $nextGroupOrder
+            $group = CreateGroup $groupName $nextGroupOrder
             $groups.Add($groupName, $group)
             $nextGroupOrder++
         }
@@ -184,8 +183,8 @@ function Group-Items($items) {
     return $groups.Values | Sort-Object Order
 }
 
-function Show-GroupedItems($items) {
-    $groupedItems = Group-Items $items
+function WriteGroupedItems($items) {
+    $groupedItems = GroupItems $items
 
     foreach ($group in $groupedItems) {
         $path = $group.Name
@@ -195,7 +194,7 @@ function Show-GroupedItems($items) {
         }
 
         Write-Host $path -ForegroundColor DarkGray
-        Write-Columns $group.Items
+        WriteColumns $group.Items
     }
 }
 
@@ -247,10 +246,10 @@ function Format-Columns {
 
     if ($items) {
         if ($GroupBy) {
-            Show-GroupedItems $items
+            WriteGroupedItems $items
         }
         else {
-            Write-Columns $items
+            WriteColumns $items
         }
     }
 }
