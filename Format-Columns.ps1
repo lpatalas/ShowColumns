@@ -231,25 +231,31 @@ function Format-Columns {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [Object] $InputObject,
 
-        [String] $Property,
+        [Object] $Property,
 
-        [String] $GroupBy
+        [Object] $GroupBy
     )
 
-    $items = @( $input ) `
-        | ForEach-Object {
-            [PSCustomObject] @{
-                Name = GetItemName $_ $Property
-                GroupName = GetGroupName $_ $GroupBy
-            }
-        }
+    begin {
+        $items = New-Object System.Collections.ArrayList
+    }
 
-    if ($items) {
-        if ($GroupBy) {
-            WriteGroupedItems $items
+    process {
+        $item = [PSCustomObject] @{
+            Name = GetItemName $_ $Property
+            GroupName = GetGroupName $_ $GroupBy
         }
-        else {
-            WriteColumns $items
+        $items.Add($item) | Out-Null
+    }
+
+    end {
+        if ($items) {
+            if ($GroupBy) {
+                WriteGroupedItems $items
+            }
+            else {
+                WriteColumns $items
+            }
         }
     }
 }
