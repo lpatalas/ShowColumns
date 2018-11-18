@@ -131,7 +131,7 @@ Test 'custom colors' {
         | Show-Columns `
             -Property Name `
             -GroupBy { Convert-Path $_.PSParentPath } `
-            -ItemColors $itemColorSelector `
+            -ItemColor $itemColorSelector `
             -GroupHeaderColor $groupColorSelector
 }
 
@@ -148,7 +148,7 @@ Test 'custom background colors' {
         | Show-Columns `
             -Property Name `
             -GroupBy { Convert-Path $_.PSParentPath } `
-            -ItemColors $colorScript `
+            -ItemColor $colorScript `
             -GroupHeaderColor @{
                 Foreground = [ConsoleColor]::Black
                 Background = [ConsoleColor]::DarkYellow

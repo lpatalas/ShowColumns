@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Management.Automation;
+﻿using System.Management.Automation;
 
 namespace ShowColumns
 {
@@ -10,10 +8,8 @@ namespace ShowColumns
         private PropertyAccessor groupByPropertyAccessor;
         private CustomColorSelector groupHeaderColorSelector;
         private CustomColorSelector itemColorSelector;
+        private ColumnItemGroupPresenter itemGroupPresenter;
         private PropertyAccessor itemNamePropertyAccessor;
-
-        private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
-        private object currentGroup;
 
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public PSObject InputObject { get; set; }
@@ -28,7 +24,7 @@ namespace ShowColumns
         public object GroupHeaderColor { get; set; }
 
         [Parameter]
-        public object ItemColors { get; set; }
+        public object ItemColor { get; set; }
 
         [Parameter]
         [ValidateRange(1, int.MaxValue)]
@@ -42,54 +38,28 @@ namespace ShowColumns
                 : _ => NoGroup.Instance;
 
             groupHeaderColorSelector = CustomColorSelectorFactory.Create(GroupHeaderColor);
-            itemColorSelector = CustomColorSelectorFactory.Create(ItemColors);
+            itemColorSelector = CustomColorSelectorFactory.Create(ItemColor);
             itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
+
+            itemGroupPresenter = new ColumnItemGroupPresenter(
+                Host,
+                groupHeaderColorSelector,
+                MinimumColumnCount);
         }
 
         protected override void ProcessRecord()
         {
-            var itemColor = itemColorSelector(InputObject);
-            var groupName = groupByPropertyAccessor.Invoke(InputObject);
-            var itemName = itemNamePropertyAccessor.Invoke(InputObject);
-            var item = new ColumnItem(itemColor, groupName, itemName?.ToString());
+            var item = new ColumnItem(
+                color: itemColorSelector(InputObject),
+                group: groupByPropertyAccessor(InputObject),
+                name: itemNamePropertyAccessor(InputObject)?.ToString());
 
-            if (object.Equals(currentGroup, item.Group))
-            {
-                currentGroupItems.Add(item);
-            }
-            else
-            {
-                FlushCurrentGroup();
-                currentGroup = item.Group;
-                currentGroupItems.Add(item);
-            }
+            itemGroupPresenter.Add(item);
         }
 
         protected override void EndProcessing()
         {
-            FlushCurrentGroup();
-        }
-
-        private void FlushCurrentGroup()
-        {
-            if (currentGroupItems.Any())
-            {
-                if (currentGroup != NoGroup.Instance)
-                {
-                    var groupHeaderColor = groupHeaderColorSelector(currentGroup);
-                    Host.UI.WriteLine(
-                        groupHeaderColor.Foreground,
-                        groupHeaderColor.Background,
-                        currentGroup.ToString());
-                }
-
-                ColumnsPresenter.WriteColumns(
-                    Host,
-                    currentGroupItems,
-                    MinimumColumnCount);
-
-                currentGroupItems.Clear();
-            }
+            itemGroupPresenter.Flush();
         }
     }
 }
