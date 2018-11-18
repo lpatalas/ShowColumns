@@ -70,8 +70,16 @@ namespace FormatColumns
                     functionsToDefine: null,
                     variablesToDefine: new List<PSVariable>(1) { new PSVariable("_", inputObject) });
                 var firstResult = results?.FirstOrDefault();
+
                 if (firstResult.BaseObject is ConsoleColor consoleColor)
+                {
                     return consoleColor;
+                }
+                else if (firstResult.BaseObject is string colorString
+                    && Enum.TryParse<ConsoleColor>(colorString, out var parsedConsoleColor))
+                {
+                    return parsedConsoleColor;
+                }
             }
 
             return ConsoleColor.Gray;
@@ -89,99 +97,15 @@ namespace FormatColumns
                 if (currentGroup != NoGroup.Instance)
                     Host.UI.WriteLine(GroupColor, ConsoleColor.Black, currentGroup.ToString());
 
-                WriteColumns(currentGroupItems);
+                ColumnsPresenter.WriteColumns(
+                    Host,
+                    currentGroupItems,
+                    MinimumColumnCount);
 
                 currentGroupItems.Clear();
             }
         }
 
-        private void WriteColumns(IReadOnlyList<ColumnItem> items)
-        {
-            var columnWidths = GetBestFittingColumnWidths(
-                currentGroupItems,
-                availableWidth: Host.UI.RawUI.BufferSize.Width,
-                minimumColumnCount: MinimumColumnCount);
-            var columnCount = columnWidths.Count;
-            var countPerColumn = GetItemCountPerColumn(items.Count, columnCount);
-
-            for (var rowIndex = 0; rowIndex < countPerColumn; rowIndex++)
-            {
-                for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
-                {
-                    var itemIndex = columnIndex * countPerColumn + rowIndex;
-                    var columnWidth = columnWidths[columnIndex];
-
-                    if (itemIndex < items.Count)
-                    {
-                        var item = items[itemIndex];
-
-                        if (columnIndex > 0)
-                            Host.UI.Write(" ");
-
-                        var displayedName = item.Width <= columnWidth
-                            ? item.Name
-                            : (item.Name.Substring(0, columnWidth - 3) + "...");
-
-                        Host.UI.Write(item.Color, ConsoleColor.Black, displayedName);
-
-                        if (columnIndex < (columnCount - 1))
-                        {
-                            var padding = columnWidth - displayedName.Length;
-                            Host.UI.Write(new string(' ', padding));
-                        }
-                    }
-                }
-
-                if (Host.UI.RawUI.CursorPosition.X > 0)
-                    Host.UI.WriteLine();
-            }
-        }
-
-        private static IReadOnlyList<int> GetBestFittingColumnWidths(
-            IReadOnlyList<ColumnItem> items,
-            int availableWidth,
-            int minimumColumnCount)
-        {
-            for (var columnCount = items.Count; columnCount > 0; columnCount--)
-            {
-                var columnWidths = GetColumnWidths(items, columnCount);
-                var totalWidth = columnWidths.Sum() + (columnWidths.Count - 1);
-
-                if (totalWidth <= availableWidth)
-                {
-                    return columnWidths;
-                }
-                else if (columnCount == minimumColumnCount)
-                {
-                    var totalSpaces = columnCount - 1;
-                    var columnWidth = (availableWidth - totalSpaces) / columnCount;
-                    return Enumerable.Repeat(columnWidth, columnCount).ToList();
-                }
-            }
-
-            return new List<int>(1) { availableWidth };
-        }
-
-        private static IReadOnlyList<int> GetColumnWidths(
-            IReadOnlyList<ColumnItem> items,
-            int columnCount)
-        {
-            var countPerColumn = GetItemCountPerColumn(items.Count, columnCount);
-            var columnWidths = new int[columnCount];
-
-            for (var index = 0; index < items.Count; index++)
-            {
-                var columnIndex = index / countPerColumn;
-                if (columnWidths[columnIndex] < items[index].Width)
-                    columnWidths[columnIndex] = items[index].Width;
-            }
-
-            return columnWidths;
-        }
-
-        private static int GetItemCountPerColumn(int totalItemCount, int columnCount)
-        {
-            return (totalItemCount + columnCount - 1) / columnCount;
-        }
+        
     }
 }
