@@ -6,32 +6,29 @@ using System.Management.Automation;
 
 namespace FormatColumns
 {
-    internal class PropertyAccessor
-    {
-        private readonly Func<PSObject, object> propertyAccessor;
+    internal delegate object PropertyAccessor(PSObject inputObject);
 
-        public PropertyAccessor(object propertyNameOrScriptBlock, string parameterName)
+    internal static class PropertyAccessorFactory
+    {
+        public static PropertyAccessor Create(object propertyNameOrScriptBlock, string parameterName)
         {
             if (propertyNameOrScriptBlock is string propertyName)
-                propertyAccessor = CreateByNamePropertyAccessor(propertyName);
+                return CreateByNamePropertyAccessor(propertyName);
             else if (propertyNameOrScriptBlock is ScriptBlock scriptBlock)
-                propertyAccessor = CreateScriptBlockPropertyAccessor(scriptBlock);
+                return CreateScriptBlockPropertyAccessor(scriptBlock);
             else
                 throw new ApplicationException(
                     $"{parameterName} parameter must be a String or ScriptBlock"
                     + $" but found '{propertyNameOrScriptBlock?.GetType()?.FullName ?? "<null>"}'.");
         }
 
-        public object Invoke(PSObject input)
-            => propertyAccessor(input);
-
-        private Func<PSObject, object> CreateByNamePropertyAccessor(string propertyName)
+        private static PropertyAccessor CreateByNamePropertyAccessor(string propertyName)
             => obj
                 => obj.BaseObject is IDictionary dictionary
                     ? dictionary[propertyName]
-                    : obj.Properties[propertyName];
+                    : obj.Properties[propertyName].Value;
 
-        private Func<PSObject, object> CreateScriptBlockPropertyAccessor(ScriptBlock scriptBlock)
+        private static PropertyAccessor CreateScriptBlockPropertyAccessor(ScriptBlock scriptBlock)
             => obj
                 => scriptBlock.InvokeWithContext(
                     functionsToDefine: null,

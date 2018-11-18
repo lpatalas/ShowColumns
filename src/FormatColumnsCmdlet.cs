@@ -16,7 +16,7 @@ namespace FormatColumns
 		[Parameter(Mandatory = true, ValueFromPipeline = true)]
 		public PSObject InputObject { get; set; }
 
-        [Parameter(Mandatory = true)]
+        [Parameter]
         public object GroupBy { get; set; }
 
 		[Parameter(Mandatory = true)]
@@ -24,8 +24,12 @@ namespace FormatColumns
 
         protected override void BeginProcessing()
         {
-            groupByPropertyAccessor = new PropertyAccessor(GroupBy, nameof(GroupBy));
-            itemNamePropertyAccessor = new PropertyAccessor(Property, nameof(Property));
+            groupByPropertyAccessor
+                = GroupBy != null
+                ? PropertyAccessorFactory.Create(GroupBy, nameof(GroupBy))
+                : _ => NoGroup.Instance;
+
+            itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
         }
 
         protected override void ProcessRecord()
@@ -55,7 +59,9 @@ namespace FormatColumns
         {
             if (currentGroupItems.Any())
             {
-                WriteObject($"=== Group {currentGroup} ===");
+                if (currentGroup != NoGroup.Instance)
+                    WriteObject($"=== Group {currentGroup} ===");
+
                 WriteColumns(currentGroupItems);
 
                 currentGroupItems.Clear();
@@ -75,11 +81,12 @@ namespace FormatColumns
                 for (var columnIndex = 0; columnIndex < columnCount; columnIndex++)
                 {
                     var itemIndex = columnIndex * countPerColumn + rowIndex;
-                    var item = items[itemIndex];
                     var columnWidth = columnWidths[columnIndex];
 
                     if (itemIndex < items.Count)
                     {
+                        var item = items[itemIndex];
+
                         if (columnIndex > 0)
                             Host.UI.Write(" ");
 
