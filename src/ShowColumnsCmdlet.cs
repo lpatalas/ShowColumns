@@ -62,19 +62,6 @@ namespace ShowColumns
             }
         }
 
-        private CustomColor GetItemColor(PSObject inputObject)
-        {
-            if (ItemColors != null)
-            {
-                var results = ItemColors.InvokeWithContext(
-                    functionsToDefine: null,
-                    variablesToDefine: new List<PSVariable>(1) { new PSVariable("_", inputObject) });
-                return CustomColor.FromPSObject(results?.FirstOrDefault());
-            }
-
-            return CustomColor.Default;
-        }
-
         protected override void EndProcessing()
         {
             FlushCurrentGroup();
@@ -101,6 +88,15 @@ namespace ShowColumns
             }
         }
 
+        private CustomColor GetItemColor(PSObject inputObject)
+        {
+            if (ItemColors != null)
+            {
+                var result = ItemColors.InvokeWithInputObject(inputObject);
+                return CustomColor.FromPSObject(result);
+            }
 
+            return CustomColor.Default;
+        }
     }
 }

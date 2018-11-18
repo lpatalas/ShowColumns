@@ -30,9 +30,6 @@ namespace ShowColumns
 
         private static PropertyAccessor CreateScriptBlockPropertyAccessor(ScriptBlock scriptBlock)
             => obj
-                => scriptBlock.InvokeWithContext(
-                    functionsToDefine: null,
-                    variablesToDefine: new List<PSVariable>(1) { new PSVariable("_", obj) })
-                    ?.FirstOrDefault();
+                => scriptBlock.InvokeWithInputObject(obj);
     }
 }
