@@ -24,7 +24,7 @@ namespace ShowColumns
         public object Property { get; set; }
 
         [Parameter]
-        public ConsoleColor GroupColor { get; set; } = ConsoleColor.DarkGray;
+        public CustomColor GroupHeaderColor { get; set; } = CustomColor.Default;
 
         [Parameter]
         public ScriptBlock ItemColors { get; set; }
@@ -62,27 +62,17 @@ namespace ShowColumns
             }
         }
 
-        private ConsoleColor GetItemColor(PSObject inputObject)
+        private CustomColor GetItemColor(PSObject inputObject)
         {
             if (ItemColors != null)
             {
                 var results = ItemColors.InvokeWithContext(
                     functionsToDefine: null,
                     variablesToDefine: new List<PSVariable>(1) { new PSVariable("_", inputObject) });
-                var firstResult = results?.FirstOrDefault();
-
-                if (firstResult.BaseObject is ConsoleColor consoleColor)
-                {
-                    return consoleColor;
-                }
-                else if (firstResult.BaseObject is string colorString
-                    && Enum.TryParse<ConsoleColor>(colorString, out var parsedConsoleColor))
-                {
-                    return parsedConsoleColor;
-                }
+                return CustomColor.FromPSObject(results?.FirstOrDefault());
             }
 
-            return ConsoleColor.Gray;
+            return CustomColor.Default;
         }
 
         protected override void EndProcessing()
@@ -95,7 +85,12 @@ namespace ShowColumns
             if (currentGroupItems.Any())
             {
                 if (currentGroup != NoGroup.Instance)
-                    Host.UI.WriteLine(GroupColor, ConsoleColor.Black, currentGroup.ToString());
+                {
+                    Host.UI.WriteLine(
+                        GroupHeaderColor.Foreground,
+                        GroupHeaderColor.Background,
+                        currentGroup.ToString());
+                }
 
                 ColumnsPresenter.WriteColumns(
                     Host,

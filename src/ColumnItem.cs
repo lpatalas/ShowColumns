@@ -4,12 +4,12 @@ namespace ShowColumns
 {
     internal class ColumnItem : IEquatable<ColumnItem>
     {
-        public ConsoleColor Color { get; set; }
+        public CustomColor Color { get; set; }
         public object Group { get; }
         public string Name { get; }
         public int Width => Name.Length;
 
-        public ColumnItem(ConsoleColor color, object group, string name)
+        public ColumnItem(CustomColor color, object group, string name)
         {
             this.Color = color;
             this.Group = group;

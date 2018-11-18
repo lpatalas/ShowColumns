@@ -125,3 +125,23 @@ Test 'custom colors' {
             -GroupBy { Convert-Path $_.PSParentPath } `
             -ItemColors $colorScript
 }
+
+Test 'custom background colors' {
+    $colorScript = {
+        switch -regex ($_.Name) {
+            '1' { [ConsoleColor]::Red }
+            '2' { @{ Foreground = [ConsoleColor]::Blue; Background = [ConsoleColor]::DarkCyan } }
+            '3' { @{ Foreground = [ConsoleColor]::Green; Background = [ConsoleColor]::DarkGreen } }
+        }
+    }
+
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
+        | Show-Columns `
+            -Property Name `
+            -GroupBy { Convert-Path $_.PSParentPath } `
+            -ItemColors $colorScript `
+            -GroupHeaderColor @{
+                Foreground = [ConsoleColor]::Black
+                Background = [ConsoleColor]::DarkYellow
+            }
+}

@@ -37,7 +37,10 @@ namespace ShowColumns
                             ? item.Name
                             : (item.Name.Substring(0, columnWidth - 3) + "...");
 
-                        host.UI.Write(item.Color, ConsoleColor.Black, displayedName);
+                        host.UI.Write(
+                            item.Color.Foreground,
+                            item.Color.Background,
+                            displayedName);
 
                         if (columnIndex < (columnCount - 1))
                         {
