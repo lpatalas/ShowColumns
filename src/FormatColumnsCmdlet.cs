@@ -29,6 +29,10 @@ namespace FormatColumns
         [Parameter]
         public ScriptBlock ItemColors { get; set; }
 
+        [Parameter]
+        [ValidateRange(1, int.MaxValue)]
+        public int MinimumColumnCount { get; set; } = 1;
+
         protected override void BeginProcessing()
         {
             groupByPropertyAccessor
@@ -95,7 +99,8 @@ namespace FormatColumns
         {
             var columnWidths = GetBestFittingColumnWidths(
                 currentGroupItems,
-                availableWidth: Host.UI.RawUI.BufferSize.Width);
+                availableWidth: Host.UI.RawUI.BufferSize.Width,
+                minimumColumnCount: MinimumColumnCount);
             var columnCount = columnWidths.Count;
             var countPerColumn = GetItemCountPerColumn(items.Count, columnCount);
 
@@ -113,15 +118,15 @@ namespace FormatColumns
                         if (columnIndex > 0)
                             Host.UI.Write(" ");
 
-                        var text = item.Width <= columnWidth
+                        var displayedName = item.Width <= columnWidth
                             ? item.Name
                             : (item.Name.Substring(0, columnWidth - 3) + "...");
 
-                        Host.UI.Write(item.Color, ConsoleColor.Black, text);
+                        Host.UI.Write(item.Color, ConsoleColor.Black, displayedName);
 
                         if (columnIndex < (columnCount - 1))
                         {
-                            var padding = columnWidth - item.Width;
+                            var padding = columnWidth - displayedName.Length;
                             Host.UI.Write(new string(' ', padding));
                         }
                     }
@@ -134,20 +139,24 @@ namespace FormatColumns
 
         private static IReadOnlyList<int> GetBestFittingColumnWidths(
             IReadOnlyList<ColumnItem> items,
-            int availableWidth)
+            int availableWidth,
+            int minimumColumnCount)
         {
-            var columnCount = items.Count;
-            var foundBestFit = false;
-
-            while (!foundBestFit && (columnCount > 0))
+            for (var columnCount = items.Count; columnCount > 0; columnCount--)
             {
                 var columnWidths = GetColumnWidths(items, columnCount);
                 var totalWidth = columnWidths.Sum() + (columnWidths.Count - 1);
 
                 if (totalWidth <= availableWidth)
+                {
                     return columnWidths;
-                else
-                    columnCount--;
+                }
+                else if (columnCount == minimumColumnCount)
+                {
+                    var totalSpaces = columnCount - 1;
+                    var columnWidth = (availableWidth - totalSpaces) / columnCount;
+                    return Enumerable.Repeat(columnWidth, columnCount).ToList();
+                }
             }
 
             return new List<int>(1) { availableWidth };

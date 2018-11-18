@@ -95,6 +95,21 @@ Test 'displaying items fitting console width exactly' {
     Get-ChildItem "$TestsDir\FitWidth" | Format-Columns -Property Name
 }
 
+Test 'displaying long items with explicit minimum column count' {
+    $items = @(
+        @{ Name = ('a' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('b' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('c' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('d' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('e' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('f' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('g' * $Host.UI.RawUI.BufferSize.Width) }
+        @{ Name = ('h' * $Host.UI.RawUI.BufferSize.Width) }
+    )
+
+    $items | Format-Columns -Property Name -MinimumColumnCount 3
+}
+
 Test 'custom colors' {
     $colorScript = {
         switch -regex ($_.Name) {
