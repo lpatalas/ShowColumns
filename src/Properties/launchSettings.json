@@ -3,7 +3,7 @@
     "FormatColumns": {
       "commandName": "Executable",
       "executablePath": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
-      "commandLineArgs": "-ExecutionPolicy RemoteSigned -NoExit -NoLogo -NoProfile -File \"$(OutputDir)Debug.ps1\"",
+      "commandLineArgs": "-ExecutionPolicy RemoteSigned -NoExit -NoLogo -NoProfile -File \"$(OutputDir)Scripts\\Debug.ps1\"",
       "workingDirectory": "$(OutputDir)"
     }
   }
