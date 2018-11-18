@@ -4,13 +4,15 @@ namespace FormatColumns
 {
     internal class ColumnItem : IEquatable<ColumnItem>
     {
+        public ConsoleColor Color { get; set; }
         public object Group { get; }
         public string Name { get; }
         public int Width => Name.Length;
 
-        public ColumnItem(object groupName, string name)
+        public ColumnItem(ConsoleColor color, object group, string name)
         {
-            this.Group = groupName;
+            this.Color = color;
+            this.Group = group;
             this.Name = name ?? string.Empty;
         }
 

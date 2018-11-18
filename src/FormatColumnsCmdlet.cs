@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 
@@ -22,6 +23,12 @@ namespace FormatColumns
 		[Parameter(Mandatory = true)]
 		public object Property { get; set; }
 
+        [Parameter]
+        public ConsoleColor GroupColor { get; set; } = ConsoleColor.DarkGray;
+
+        [Parameter]
+        public ScriptBlock ItemColors { get; set; }
+
         protected override void BeginProcessing()
         {
             groupByPropertyAccessor
@@ -34,9 +41,10 @@ namespace FormatColumns
 
         protected override void ProcessRecord()
 		{
+            var color = GetItemColor(InputObject);
             var groupName = groupByPropertyAccessor.Invoke(InputObject);
             var itemName = itemNamePropertyAccessor.Invoke(InputObject);
-            var item = new ColumnItem(groupName, itemName?.ToString());
+            var item = new ColumnItem(color, groupName, itemName?.ToString());
 
             if (object.Equals(currentGroup, item.Group))
             {
@@ -50,6 +58,21 @@ namespace FormatColumns
             }
 		}
 
+        private ConsoleColor GetItemColor(PSObject inputObject)
+        {
+            if (ItemColors != null)
+            {
+                var results = ItemColors.InvokeWithContext(
+                    functionsToDefine: null,
+                    variablesToDefine: new List<PSVariable>(1) { new PSVariable("_", inputObject) });
+                var firstResult = results?.FirstOrDefault();
+                if (firstResult.BaseObject is ConsoleColor consoleColor)
+                    return consoleColor;
+            }
+
+            return ConsoleColor.Gray;
+        }
+
         protected override void EndProcessing()
         {
             FlushCurrentGroup();
@@ -60,7 +83,7 @@ namespace FormatColumns
             if (currentGroupItems.Any())
             {
                 if (currentGroup != NoGroup.Instance)
-                    WriteObject($"=== Group {currentGroup} ===");
+                    Host.UI.WriteLine(GroupColor, ConsoleColor.Black, currentGroup.ToString());
 
                 WriteColumns(currentGroupItems);
 
@@ -90,7 +113,10 @@ namespace FormatColumns
                         if (columnIndex > 0)
                             Host.UI.Write(" ");
 
-                        Host.UI.Write(item.Name);
+                        Host.UI.Write(
+                            item.Color,
+                            ConsoleColor.Black,
+                            item.Name);
 
                         if (columnIndex < (columnCount - 1))
                         {
