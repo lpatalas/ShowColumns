@@ -2,8 +2,8 @@
 
 $objs = @(
 	@{ Name = 'First'; Group = "Group1" }
-	@{ Name = 'Second'; Group = "Group2" }
-	@{ Name = 'Third'; Group = "Group1" }
+	@{ Name = 'Second'; Group = "Group1" }
+	@{ Name = 'Third'; Group = "Group2" }
 )
 
 Write-Host "By property name:" -ForegroundColor Yellow

@@ -13,7 +13,8 @@ namespace FormatColumns
         private PropertyAccessor groupByPropertyAccessor;
         private PropertyAccessor itemNamePropertyAccessor;
 
-        private readonly List<ColumnItem> items = new List<ColumnItem>();
+        private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
+        private object currentGroup;
 
 		[Parameter(Mandatory = true, ValueFromPipeline = true)]
 		public PSObject InputObject { get; set; }
@@ -35,13 +36,34 @@ namespace FormatColumns
             var groupName = groupByPropertyAccessor.Invoke(InputObject);
             var itemName = itemNamePropertyAccessor.Invoke(InputObject);
             var item = new ColumnItem(groupName, itemName);
-            items.Add(item);
+
+            if (object.Equals(currentGroup, item.Group))
+            {
+                currentGroupItems.Add(item);
+            }
+            else
+            {
+                FlushCurrentGroup();
+                currentGroup = item.Group;
+                currentGroupItems.Add(item);
+            }
 		}
 
         protected override void EndProcessing()
         {
-            foreach (var item in items)
-                WriteObject(item.ToString());
+            FlushCurrentGroup();
+        }
+
+        private void FlushCurrentGroup()
+        {
+            if (currentGroupItems.Any())
+            {
+                WriteObject($"=== Group {currentGroup} ===");
+                foreach (var groupItem in currentGroupItems)
+                    WriteObject(groupItem.ToString());
+
+                currentGroupItems.Clear();
+            }
         }
     }
 }
