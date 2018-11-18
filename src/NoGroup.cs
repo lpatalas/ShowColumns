@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FormatColumns
+namespace ShowColumns
 {
     internal class NoGroup : IEquatable<NoGroup>
     {

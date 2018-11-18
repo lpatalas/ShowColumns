@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 
-namespace FormatColumns
+namespace ShowColumns
 {
-    [Cmdlet("Format", "Columns")]
-	public class FormatColumnsCmdlet : PSCmdlet
+    [Cmdlet(VerbsCommon.Show, "Columns")]
+	public class ShowColumnsCmdlet : PSCmdlet
 	{
         private PropertyAccessor groupByPropertyAccessor;
         private PropertyAccessor itemNamePropertyAccessor;

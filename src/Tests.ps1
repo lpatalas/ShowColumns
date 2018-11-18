@@ -56,43 +56,43 @@ function Test($description, $script) {
 Prepare-TestData
 
 Test 'empty directory' {
-    Get-ChildItem "$TestsDir\Empty" | Format-Columns -Property Name
+    Get-ChildItem "$TestsDir\Empty" | Show-Columns -Property Name
 }
 
 Test 'listing folder contents non-recursively' {
-    Get-ChildItem "$TestsDir\Subfolders" | Format-Columns -Property Name
+    Get-ChildItem "$TestsDir\Subfolders" | Show-Columns -Property Name
 }
 
 Test 'organizing items into multiple columns' {
-    Get-ChildItem "$TestsDir\Columns" | Format-Columns -Property Name
+    Get-ChildItem "$TestsDir\Columns" | Show-Columns -Property Name
 }
 
 Test 'listing folder contents non-recursively in reverse order' {
-    Get-ChildItem "$TestsDir\Subfolders" | Sort-Object -Descending | Format-Columns -Property Name
+    Get-ChildItem "$TestsDir\Subfolders" | Sort-Object -Descending | Show-Columns -Property Name
 }
 
 Test 'listing objects longer than console window width' {
     @{ Name = 'a' * ($Host.UI.RawUI.BufferSize.Width + 10) } `
-        | Format-Columns -Property Name
+        | Show-Columns -Property Name
 }
 
 Test 'listing folder contents recursively' {
-    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Format-Columns -Property Name
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse | Show-Columns -Property Name
 }
 
 Test 'listing folder contents recursively grouped by directory' {
     Get-ChildItem "$TestsDir\Subfolders" -Recurse `
-        | Format-Columns -Property Name -GroupBy { Convert-Path $_.PSParentPath }
+        | Show-Columns -Property Name -GroupBy { Convert-Path $_.PSParentPath }
 }
 
 Test 'listing folder contents recursively, sorted in descending order and grouped by directory' {
     Get-ChildItem "$TestsDir\Subfolders" -Recurse `
         | Sort-Object Name -Descending `
-        | Format-Columns -Property Name -GroupBy { Convert-Path $_.PSParentPath }
+        | Show-Columns -Property Name -GroupBy { Convert-Path $_.PSParentPath }
 }
 
 Test 'displaying items fitting console width exactly' {
-    Get-ChildItem "$TestsDir\FitWidth" | Format-Columns -Property Name
+    Get-ChildItem "$TestsDir\FitWidth" | Show-Columns -Property Name
 }
 
 Test 'displaying long items with explicit minimum column count' {
@@ -107,7 +107,7 @@ Test 'displaying long items with explicit minimum column count' {
         @{ Name = ('h' * $Host.UI.RawUI.BufferSize.Width) }
     )
 
-    $items | Format-Columns -Property Name -MinimumColumnCount 3
+    $items | Show-Columns -Property Name -MinimumColumnCount 3
 }
 
 Test 'custom colors' {
@@ -120,7 +120,7 @@ Test 'custom colors' {
     }
 
     Get-ChildItem "$TestsDir\Subfolders" -Recurse `
-        | Format-Columns `
+        | Show-Columns `
             -Property Name `
             -GroupBy { Convert-Path $_.PSParentPath } `
             -ItemColors $colorScript

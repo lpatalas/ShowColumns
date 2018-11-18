@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation.Host;
 
-namespace FormatColumns
+namespace ShowColumns
 {
     internal class ColumnsPresenter
     {
