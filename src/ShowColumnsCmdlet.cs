@@ -8,6 +8,7 @@ namespace ShowColumns
     public class ShowColumnsCmdlet : PSCmdlet
     {
         private PropertyAccessor groupByPropertyAccessor;
+        private CustomColorSelector itemColorSelector;
         private PropertyAccessor itemNamePropertyAccessor;
 
         private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
@@ -39,15 +40,16 @@ namespace ShowColumns
                 ? PropertyAccessorFactory.Create(GroupBy, nameof(GroupBy))
                 : _ => NoGroup.Instance;
 
+            itemColorSelector = CustomColorSelectorFactory.Create(ItemColors);
             itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
         }
 
         protected override void ProcessRecord()
         {
-            var color = GetItemColor(InputObject);
+            var itemColor = itemColorSelector(InputObject);
             var groupName = groupByPropertyAccessor.Invoke(InputObject);
             var itemName = itemNamePropertyAccessor.Invoke(InputObject);
-            var item = new ColumnItem(color, groupName, itemName?.ToString());
+            var item = new ColumnItem(itemColor, groupName, itemName?.ToString());
 
             if (object.Equals(currentGroup, item.Group))
             {
@@ -85,17 +87,6 @@ namespace ShowColumns
 
                 currentGroupItems.Clear();
             }
-        }
-
-        private CustomColor GetItemColor(PSObject inputObject)
-        {
-            if (ItemColors != null)
-            {
-                var result = ItemColors.InvokeWithInputObject(inputObject);
-                return CustomColor.FromPSObject(result);
-            }
-
-            return CustomColor.Default;
         }
     }
 }
