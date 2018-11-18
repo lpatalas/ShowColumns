@@ -71,6 +71,11 @@ Test 'listing folder contents non-recursively in reverse order' {
     Get-ChildItem "$TestsDir\Subfolders" | Sort-Object -Descending | Format-Columns -Property Name
 }
 
+Test 'listing objects longer than console window width' {
+    @{ Name = 'a' * ($Host.UI.RawUI.BufferSize.Width + 10) } `
+        | Format-Columns -Property Name
+}
+
 Test 'listing folder contents recursively' {
     Get-ChildItem "$TestsDir\Subfolders" -Recurse | Format-Columns -Property Name
 }

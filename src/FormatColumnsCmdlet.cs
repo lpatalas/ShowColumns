@@ -113,10 +113,11 @@ namespace FormatColumns
                         if (columnIndex > 0)
                             Host.UI.Write(" ");
 
-                        Host.UI.Write(
-                            item.Color,
-                            ConsoleColor.Black,
-                            item.Name);
+                        var text = item.Width <= columnWidth
+                            ? item.Name
+                            : (item.Name.Substring(0, columnWidth - 3) + "...");
+
+                        Host.UI.Write(item.Color, ConsoleColor.Black, text);
 
                         if (columnIndex < (columnCount - 1))
                         {
