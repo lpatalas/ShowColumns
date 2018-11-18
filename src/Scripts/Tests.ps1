@@ -111,7 +111,7 @@ Test 'displaying long items with explicit minimum column count' {
 }
 
 Test 'custom colors' {
-    $colorScript = {
+    $itemColorSelector = {
         switch -regex ($_.Name) {
             '1' { [ConsoleColor]::Red }
             '2' { [ConsoleColor]::Blue }
@@ -119,11 +119,20 @@ Test 'custom colors' {
         }
     }
 
+    $groupColorSelector = {
+        switch -regex ($_) {
+            '1$' { [ConsoleColor]::Red }
+            '2$' { [ConsoleColor]::Blue }
+            '3$' { [ConsoleColor]::Green }
+        }
+    }
+
     Get-ChildItem "$TestsDir\Subfolders" -Recurse `
         | Show-Columns `
             -Property Name `
             -GroupBy { Convert-Path $_.PSParentPath } `
-            -ItemColors $colorScript
+            -ItemColors $itemColorSelector `
+            -GroupHeaderColor $groupColorSelector
 }
 
 Test 'custom background colors' {

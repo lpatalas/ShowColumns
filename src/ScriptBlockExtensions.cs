@@ -8,7 +8,7 @@ namespace ShowColumns
     {
         public static PSObject InvokeWithInputObject(
             this ScriptBlock scriptBlock,
-            PSObject inputObject)
+            object inputObject)
         {
             var variables = new List<PSVariable>(1)
             {

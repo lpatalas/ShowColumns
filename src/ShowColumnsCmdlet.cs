@@ -8,6 +8,7 @@ namespace ShowColumns
     public class ShowColumnsCmdlet : PSCmdlet
     {
         private PropertyAccessor groupByPropertyAccessor;
+        private CustomColorSelector groupHeaderColorSelector;
         private CustomColorSelector itemColorSelector;
         private PropertyAccessor itemNamePropertyAccessor;
 
@@ -24,10 +25,10 @@ namespace ShowColumns
         public object Property { get; set; }
 
         [Parameter]
-        public CustomColor GroupHeaderColor { get; set; } = CustomColor.Default;
+        public object GroupHeaderColor { get; set; }
 
         [Parameter]
-        public ScriptBlock ItemColors { get; set; }
+        public object ItemColors { get; set; }
 
         [Parameter]
         [ValidateRange(1, int.MaxValue)]
@@ -40,6 +41,7 @@ namespace ShowColumns
                 ? PropertyAccessorFactory.Create(GroupBy, nameof(GroupBy))
                 : _ => NoGroup.Instance;
 
+            groupHeaderColorSelector = CustomColorSelectorFactory.Create(GroupHeaderColor);
             itemColorSelector = CustomColorSelectorFactory.Create(ItemColors);
             itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
         }
@@ -74,9 +76,10 @@ namespace ShowColumns
             {
                 if (currentGroup != NoGroup.Instance)
                 {
+                    var groupHeaderColor = groupHeaderColorSelector(currentGroup);
                     Host.UI.WriteLine(
-                        GroupHeaderColor.Foreground,
-                        GroupHeaderColor.Background,
+                        groupHeaderColor.Foreground,
+                        groupHeaderColor.Background,
                         currentGroup.ToString());
                 }
 

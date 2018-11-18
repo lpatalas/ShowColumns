@@ -41,15 +41,17 @@ namespace ShowColumns
             this.Background = ConsoleColor.Black;
         }
 
-        public static CustomColor FromPSObject(PSObject inputObject)
+        public static CustomColor FromObject(object inputObject)
         {
-            if (inputObject?.BaseObject != null)
+            if (inputObject != null)
             {
-                if (inputObject.BaseObject is ConsoleColor foregroundColor)
+                if (inputObject is PSObject psObject)
+                    return FromObject(psObject.BaseObject);
+                else if (inputObject is ConsoleColor foregroundColor)
                     return new CustomColor(foregroundColor);
-                else if (inputObject.BaseObject is string foregroundColorName)
+                else if (inputObject is string foregroundColorName)
                     return new CustomColor(foregroundColorName);
-                else if (inputObject.BaseObject is IDictionary dictionary)
+                else if (inputObject is IDictionary dictionary)
                     return new CustomColor(dictionary);
             }
 
