@@ -89,3 +89,19 @@ Test 'listing folder contents recursively, sorted in descending order and groupe
 Test 'displaying items fitting console width exactly' {
     Get-ChildItem "$TestsDir\FitWidth" | Format-Columns -Property Name
 }
+
+Test 'custom colors' {
+    $colorScript = {
+        switch -regex ($_.Name) {
+            '1' { [ConsoleColor]::Red }
+            '2' { [ConsoleColor]::Blue }
+            '3' { [ConsoleColor]::Green }
+        }
+    }
+
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
+        | Format-Columns `
+            -Property Name `
+            -GroupBy { Convert-Path $_.PSParentPath } `
+            -ItemColors $colorScript
+}
