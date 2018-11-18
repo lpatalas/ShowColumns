@@ -6,22 +6,22 @@ using System.Management.Automation;
 namespace ShowColumns
 {
     [Cmdlet(VerbsCommon.Show, "Columns")]
-	public class ShowColumnsCmdlet : PSCmdlet
-	{
+    public class ShowColumnsCmdlet : PSCmdlet
+    {
         private PropertyAccessor groupByPropertyAccessor;
         private PropertyAccessor itemNamePropertyAccessor;
 
         private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
         private object currentGroup;
 
-		[Parameter(Mandatory = true, ValueFromPipeline = true)]
-		public PSObject InputObject { get; set; }
+        [Parameter(Mandatory = true, ValueFromPipeline = true)]
+        public PSObject InputObject { get; set; }
 
         [Parameter]
         public object GroupBy { get; set; }
 
-		[Parameter(Mandatory = true)]
-		public object Property { get; set; }
+        [Parameter(Mandatory = true)]
+        public object Property { get; set; }
 
         [Parameter]
         public ConsoleColor GroupColor { get; set; } = ConsoleColor.DarkGray;
@@ -44,7 +44,7 @@ namespace ShowColumns
         }
 
         protected override void ProcessRecord()
-		{
+        {
             var color = GetItemColor(InputObject);
             var groupName = groupByPropertyAccessor.Invoke(InputObject);
             var itemName = itemNamePropertyAccessor.Invoke(InputObject);
@@ -60,7 +60,7 @@ namespace ShowColumns
                 currentGroup = item.Group;
                 currentGroupItems.Add(item);
             }
-		}
+        }
 
         private ConsoleColor GetItemColor(PSObject inputObject)
         {
@@ -106,6 +106,6 @@ namespace ShowColumns
             }
         }
 
-        
+
     }
 }
