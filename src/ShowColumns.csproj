@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup Condition="'$(ModuleVersion)'==''">
+    <ModuleVersion>0.0.0</ModuleVersion>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <AssemblyVersion>$(ModuleVersion)</AssemblyVersion>
     <Authors>Łukasz Patalas</Authors>
     <Company>Łukasz Patalas</Company>
     <Copyright>Copyright (c) 2018 Łukasz Patalas</Copyright>
-    <FileVersion>0.1.0.0</FileVersion>
-    <Version>0.1.0</Version>
+    <FileVersion>$(ModuleVersion).0</FileVersion>
+    <Version>$(ModuleVersion)</Version>
   </PropertyGroup>
 
   <ItemGroup>

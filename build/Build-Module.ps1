@@ -7,12 +7,17 @@ $solutionPath = Join-Path $workspaceRoot 'src' 'ShowColumns.sln'
 $publishOutputPath = Join-Path $workspaceRoot 'build' 'output' 'publish'
 $modulesRootPath = Join-Path $workspaceRoot 'build' 'output' 'modules'
 $moduleOutputPath = Join-Path $modulesRootPath 'ShowColumns'
+$manifestPath = Join-Path $workspaceRoot 'ShowColumns.psd1'
+$manifest = Get-Content $manifestPath -Raw | Invoke-Expression
+$moduleVersion = $manifest.ModuleVersion
 
 Write-Host "Publishing solution '$solutionPath' to '$publishOutputPath'" -ForegroundColor Yellow
+Write-Host "Version: $moduleVersion"
 
 dotnet publish `
     --configuration Release `
     --output "$publishOutputPath" `
+    /p:ModuleVersion="$moduleVersion" `
     "$solutionPath"
 
 if ($LASTEXITCODE -ne 0) {
