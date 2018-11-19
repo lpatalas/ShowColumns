@@ -1,7 +1,12 @@
+param(
+    [String] $PublishToRepository
+)
+
 $workspaceRoot = Convert-Path (git rev-parse --show-toplevel)
 $solutionPath = Join-Path $workspaceRoot 'src' 'ShowColumns.sln'
 $publishOutputPath = Join-Path $workspaceRoot 'build' 'output' 'publish'
-$moduleOutputPath = Join-Path $workspaceRoot 'build' 'output' 'ShowColumns'
+$modulesRootPath = Join-Path $workspaceRoot 'build' 'output' 'modules'
+$moduleOutputPath = Join-Path $modulesRootPath 'ShowColumns'
 
 Write-Host "Publishing solution '$solutionPath' to '$publishOutputPath'" -ForegroundColor Yellow
 
@@ -42,4 +47,19 @@ $packageFiles | ForEach-Object {
         -Destination $moduleOutputPath `
         -Container `
         -ErrorAction Stop
+}
+
+if ($PublishToRepository) {
+    Write-Host "Publishing to repository '$PublishToRepository'" -ForegroundColor Yellow
+
+    $originalModulePath = $env:PSModulePath
+    try {
+        $env:PSModulePath += ";$modulesRootPath"
+        Publish-Module `
+            -Name ShowColumns `
+            -Repository $PublishToRepository
+    }
+    finally {
+        $env:PSModulePath = $originalModulePath
+    }
 }
