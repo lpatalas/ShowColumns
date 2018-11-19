@@ -3,11 +3,12 @@ param(
 )
 
 $workspaceRoot = Convert-Path (git rev-parse --show-toplevel)
+$scriptsRoot = Join-Path $workspaceRoot 'scripts'
 $solutionPath = Join-Path $workspaceRoot 'src' 'ShowColumns.sln'
 $publishOutputPath = Join-Path $workspaceRoot 'build' 'output' 'publish'
 $modulesRootPath = Join-Path $workspaceRoot 'build' 'output' 'modules'
 $moduleOutputPath = Join-Path $modulesRootPath 'ShowColumns'
-$manifestPath = Join-Path $workspaceRoot 'ShowColumns.psd1'
+$manifestPath = Join-Path $scriptsRoot 'ShowColumns.psd1'
 $manifest = Get-Content $manifestPath -Raw | Invoke-Expression
 $moduleVersion = $manifest.ModuleVersion
 
@@ -42,7 +43,7 @@ New-Item `
 
 $packageFiles = @(
     Join-Path $publishOutputPath 'ShowColumns.dll'
-    Join-Path $workspaceRoot 'ShowColumns.psd1'
+    (Get-ChildItem $scriptsRoot | ForEach-Object FullName)
 )
 
 $packageFiles | ForEach-Object {
@@ -51,6 +52,7 @@ $packageFiles | ForEach-Object {
         -Path $_ `
         -Destination $moduleOutputPath `
         -Container `
+        -Recurse `
         -ErrorAction Stop
 }
 
