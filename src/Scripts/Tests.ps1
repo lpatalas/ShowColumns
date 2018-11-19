@@ -111,7 +111,7 @@ Test 'displaying long items with explicit minimum column count' {
 }
 
 Test 'custom colors' {
-    $itemColorSelector = {
+    $itemStyleSelector = {
         switch -regex ($_.Name) {
             '1' { [ConsoleColor]::Red }
             '2' { [ConsoleColor]::Blue }
@@ -119,7 +119,7 @@ Test 'custom colors' {
         }
     }
 
-    $groupColorSelector = {
+    $groupStyleSelector = {
         switch -regex ($_) {
             '1$' { [ConsoleColor]::Red }
             '2$' { [ConsoleColor]::Blue }
@@ -131,26 +131,51 @@ Test 'custom colors' {
         | Show-Columns `
             -Property Name `
             -GroupBy { Convert-Path $_.PSParentPath } `
-            -ItemColor $itemColorSelector `
-            -GroupHeaderColor $groupColorSelector
+            -ItemStyle $itemStyleSelector `
+            -GroupHeaderStyle $groupStyleSelector
 }
 
-Test 'custom background colors' {
-    $colorScript = {
+Test 'custom styles colors' {
+    $itemStyleSelector = {
         switch -regex ($_.Name) {
-            '1' { [ConsoleColor]::Red }
+            '1' { @{ Foreground = [ConsoleColor]::Red } }
             '2' { @{ Foreground = [ConsoleColor]::Blue; Background = [ConsoleColor]::DarkCyan } }
             '3' { @{ Foreground = [ConsoleColor]::Green; Background = [ConsoleColor]::DarkGreen } }
         }
+    }
+
+    $groupStyle = @{
+        Foreground = [ConsoleColor]::Red
+        Background = [ConsoleColor]::DarkMagenta
+        Underline = $true
     }
 
     Get-ChildItem "$TestsDir\Subfolders" -Recurse `
         | Show-Columns `
             -Property Name `
             -GroupBy { Convert-Path $_.PSParentPath } `
-            -ItemColor $colorScript `
-            -GroupHeaderColor @{
-                Foreground = [ConsoleColor]::Black
-                Background = [ConsoleColor]::DarkYellow
-            }
+            -ItemStyle $itemStyleSelector `
+            -GroupHeaderStyle $groupStyle
+}
+
+Test 'custom italic and underline colors' {
+    $itemStyleSelector = {
+        switch -regex ($_.Name) {
+            '1' { @{ Foreground = [ConsoleColor]::Red; Italic = $true } }
+            '2' { @{ Foreground = [ConsoleColor]::Blue; Background = [ConsoleColor]::DarkCyan } }
+            '3' { @{ Foreground = [ConsoleColor]::Green; Background = [ConsoleColor]::DarkGreen } }
+        }
+    }
+
+    $groupStyle = @{
+        Foreground = [ConsoleColor]::Yellow
+        Underline = $true
+    }
+
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
+        | Show-Columns `
+            -Property Name `
+            -GroupBy { Convert-Path $_.PSParentPath } `
+            -ItemStyle $itemStyleSelector `
+            -GroupHeaderStyle $groupStyle
 }

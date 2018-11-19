@@ -8,17 +8,17 @@ namespace ShowColumns
     {
         private object currentGroup;
         private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
-        private readonly CustomColorSelector groupHeaderColorSelector;
+        private readonly StyleSelector groupHeaderStyleSelector;
         private readonly PSHost host;
         private readonly int minimumColumnCount;
 
         public ColumnItemGroupPresenter(
             PSHost host,
-            CustomColorSelector groupHeaderColorSelector,
+            StyleSelector groupHeaderStyleSelector,
             int minimumColumnCount)
         {
             this.host = host;
-            this.groupHeaderColorSelector = groupHeaderColorSelector;
+            this.groupHeaderStyleSelector = groupHeaderStyleSelector;
             this.minimumColumnCount = minimumColumnCount;
         }
 
@@ -42,11 +42,11 @@ namespace ShowColumns
             {
                 if (currentGroup != NoGroup.Instance)
                 {
-                    var groupHeaderColor = groupHeaderColorSelector(currentGroup);
+                    var groupHeaderStyle = groupHeaderStyleSelector(currentGroup);
                     host.UI.WriteLine(
-                        groupHeaderColor.Foreground,
-                        groupHeaderColor.Background,
-                        currentGroup.ToString());
+                        currentGroup
+                            .ToString()
+                            .WithStyle(groupHeaderStyle));
                 }
 
                 ColumnsPresenter.WriteColumns(

@@ -4,16 +4,16 @@ namespace ShowColumns
 {
     internal class ColumnItem : IEquatable<ColumnItem>
     {
-        public CustomColor Color { get; set; }
         public object Group { get; }
         public string Name { get; }
+        public Style Style { get; set; }
         public int Width => Name.Length;
 
-        public ColumnItem(CustomColor color, object group, string name)
+        public ColumnItem(object group, string name, Style style)
         {
-            this.Color = color;
             this.Group = group;
             this.Name = name ?? string.Empty;
+            this.Style = style;
         }
 
         public bool Equals(ColumnItem other)

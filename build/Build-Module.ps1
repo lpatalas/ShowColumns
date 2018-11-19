@@ -61,7 +61,7 @@ if ($PublishToRepository) {
     try {
         $env:PSModulePath += ";$modulesRootPath"
         Publish-Module `
-            -Name ShowColumns `
+            -Path $moduleOutputPath `
             -Repository $PublishToRepository
     }
     finally {

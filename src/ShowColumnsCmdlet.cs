@@ -6,8 +6,8 @@ namespace ShowColumns
     public class ShowColumnsCmdlet : PSCmdlet
     {
         private PropertyAccessor groupByPropertyAccessor;
-        private CustomColorSelector groupHeaderColorSelector;
-        private CustomColorSelector itemColorSelector;
+        private StyleSelector groupHeaderStyleSelector;
+        private StyleSelector itemStyleSelector;
         private ColumnItemGroupPresenter itemGroupPresenter;
         private PropertyAccessor itemNamePropertyAccessor;
 
@@ -21,10 +21,10 @@ namespace ShowColumns
         public object Property { get; set; }
 
         [Parameter]
-        public object GroupHeaderColor { get; set; }
+        public object GroupHeaderStyle { get; set; }
 
         [Parameter]
-        public object ItemColor { get; set; }
+        public object ItemStyle { get; set; }
 
         [Parameter]
         [ValidateRange(1, int.MaxValue)]
@@ -37,22 +37,22 @@ namespace ShowColumns
                 ? PropertyAccessorFactory.Create(GroupBy, nameof(GroupBy))
                 : _ => NoGroup.Instance;
 
-            groupHeaderColorSelector = CustomColorSelectorFactory.Create(GroupHeaderColor);
-            itemColorSelector = CustomColorSelectorFactory.Create(ItemColor);
+            groupHeaderStyleSelector = StyleSelectorFactory.Create(GroupHeaderStyle);
+            itemStyleSelector = StyleSelectorFactory.Create(ItemStyle);
             itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
 
             itemGroupPresenter = new ColumnItemGroupPresenter(
                 Host,
-                groupHeaderColorSelector,
+                groupHeaderStyleSelector,
                 MinimumColumnCount);
         }
 
         protected override void ProcessRecord()
         {
             var item = new ColumnItem(
-                color: itemColorSelector(InputObject),
                 group: groupByPropertyAccessor(InputObject),
-                name: itemNamePropertyAccessor(InputObject)?.ToString());
+                name: itemNamePropertyAccessor(InputObject)?.ToString(),
+                style: itemStyleSelector(InputObject));
 
             itemGroupPresenter.Add(item);
         }
