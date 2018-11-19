@@ -10,6 +10,7 @@ namespace ShowColumns
         private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
         private readonly StyleSelector groupHeaderStyleSelector;
         private readonly PSHost host;
+        private bool isFirstGroup = true;
         private readonly int minimumColumnCount;
 
         public ColumnItemGroupPresenter(
@@ -42,6 +43,9 @@ namespace ShowColumns
             {
                 if (currentGroup != NoGroup.Instance)
                 {
+                    if (!isFirstGroup)
+                        host.UI.WriteLine();
+
                     var groupHeaderStyle = groupHeaderStyleSelector(currentGroup);
                     host.UI.WriteLine(
                         currentGroup
@@ -55,6 +59,7 @@ namespace ShowColumns
                     minimumColumnCount);
 
                 currentGroupItems.Clear();
+                isFirstGroup = false;
             }
         }
     }
