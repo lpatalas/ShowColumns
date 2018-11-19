@@ -1,7 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyVersion>0.1.0</AssemblyVersion>
+    <Authors>Łukasz Patalas</Authors>
+    <Company>Łukasz Patalas</Company>
+    <Copyright>Copyright (c) 2018 Łukasz Patalas</Copyright>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
