@@ -4,7 +4,7 @@ param(
 
 $workspaceRoot = Convert-Path (git rev-parse --show-toplevel)
 $scriptsRoot = Join-Path $workspaceRoot 'scripts'
-$solutionPath = Join-Path $workspaceRoot 'src' 'ShowColumns.sln'
+$projectPath = Join-Path $workspaceRoot 'src' 'ShowColumns' 'ShowColumns.csproj'
 $publishOutputPath = Join-Path $workspaceRoot 'build' 'output' 'publish'
 $modulesRootPath = Join-Path $workspaceRoot 'build' 'output' 'modules'
 $moduleOutputPath = Join-Path $modulesRootPath 'ShowColumns'
@@ -12,14 +12,14 @@ $manifestPath = Join-Path $scriptsRoot 'ShowColumns.psd1'
 $manifest = Get-Content $manifestPath -Raw | Invoke-Expression
 $moduleVersion = $manifest.ModuleVersion
 
-Write-Host "Publishing solution '$solutionPath' to '$publishOutputPath'" -ForegroundColor Yellow
+Write-Host "Publishing solution '$projectPath' to '$publishOutputPath'" -ForegroundColor Yellow
 Write-Host "Version: $moduleVersion"
 
 dotnet publish `
     --configuration Release `
     --output "$publishOutputPath" `
     /p:ModuleVersion="$moduleVersion" `
-    "$solutionPath"
+    "$projectPath"
 
 if ($LASTEXITCODE -ne 0) {
     throw "dotnet publish exited with error code $LASTEXITCODE"
@@ -42,14 +42,14 @@ New-Item `
     | Out-Null
 
 $packageFiles = @(
-    Join-Path $publishOutputPath 'ShowColumns.dll'
-    (Get-ChildItem $scriptsRoot | ForEach-Object FullName)
+    Get-ChildItem $publishOutputPath -Filter '*.dll'
+    Get-ChildItem $scriptsRoot
 )
 
 $packageFiles | ForEach-Object {
     Write-Host "Copying $_"
     Copy-Item `
-        -Path $_ `
+        -Path $_.FullName `
         -Destination $moduleOutputPath `
         -Container `
         -Recurse `
