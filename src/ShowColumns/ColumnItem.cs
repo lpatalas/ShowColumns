@@ -6,10 +6,10 @@ namespace ShowColumns
     {
         public object Group { get; }
         public string Name { get; }
-        public Style Style { get; set; }
+        public TextStyle Style { get; set; }
         public int Width => Name.Length;
 
-        public ColumnItem(object group, string name, Style style)
+        public ColumnItem(object group, string name, TextStyle style)
         {
             this.Group = group;
             this.Name = name ?? string.Empty;

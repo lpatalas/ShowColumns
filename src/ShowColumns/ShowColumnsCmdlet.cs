@@ -6,8 +6,8 @@ namespace ShowColumns
     public class ShowColumnsCmdlet : PSCmdlet
     {
         private PropertyAccessor groupByPropertyAccessor;
-        private StyleSelector groupHeaderStyleSelector;
-        private StyleSelector itemStyleSelector;
+        private TextStyleSelector groupHeaderStyleSelector;
+        private TextStyleSelector itemStyleSelector;
         private ColumnItemGroupPresenter itemGroupPresenter;
         private PropertyAccessor itemNamePropertyAccessor;
 
@@ -37,8 +37,8 @@ namespace ShowColumns
                 ? PropertyAccessorFactory.Create(GroupBy, nameof(GroupBy))
                 : _ => NoGroup.Instance;
 
-            groupHeaderStyleSelector = StyleSelectorFactory.Create(GroupHeaderStyle);
-            itemStyleSelector = StyleSelectorFactory.Create(ItemStyle);
+            groupHeaderStyleSelector = TextStyleSelectorFactory.Create(GroupHeaderStyle);
+            itemStyleSelector = TextStyleSelectorFactory.Create(ItemStyle);
             itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
 
             itemGroupPresenter = new ColumnItemGroupPresenter(

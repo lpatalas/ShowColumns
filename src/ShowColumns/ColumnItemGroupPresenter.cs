@@ -8,14 +8,14 @@ namespace ShowColumns
     {
         private object currentGroup;
         private readonly List<ColumnItem> currentGroupItems = new List<ColumnItem>();
-        private readonly StyleSelector groupHeaderStyleSelector;
+        private readonly TextStyleSelector groupHeaderStyleSelector;
         private readonly PSHost host;
         private bool isFirstGroup = true;
         private readonly int minimumColumnCount;
 
         public ColumnItemGroupPresenter(
             PSHost host,
-            StyleSelector groupHeaderStyleSelector,
+            TextStyleSelector groupHeaderStyleSelector,
             int minimumColumnCount)
         {
             this.host = host;

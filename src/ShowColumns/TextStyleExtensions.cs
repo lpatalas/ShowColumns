@@ -3,12 +3,12 @@ using System.Text;
 
 namespace ShowColumns
 {
-    internal static class StyleExtensions
+    internal static class TextStyleExtensions
     {
         private const char ESC = (char)0x1b;
         private static readonly string Reset = $"{ESC}[0m";
 
-        public static string WithStyle(this string input, Style style)
+        public static string WithStyle(this string input, TextStyle style)
         {
             if (style.IsDefault)
                 return input;
