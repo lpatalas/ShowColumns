@@ -1,4 +1,6 @@
-﻿$CurrentDir = (Split-Path $MyInvocation.MyCommand.Definition)
+﻿Import-Module "$PSScriptRoot\ShowColumns.dll"
+
+$CurrentDir = (Split-Path $MyInvocation.MyCommand.Definition)
 $TestsDir = (Join-Path $CurrentDir 'TestData')
 
 function Clear-Directory($path) {
@@ -179,3 +181,4 @@ Test 'custom italic and underline colors' {
             -ItemStyle $itemStyleSelector `
             -GroupHeaderStyle $groupStyle
 }
+

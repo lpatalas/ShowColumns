@@ -18,13 +18,4 @@
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0-RC1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Scripts\Debug.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Scripts\Tests.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
