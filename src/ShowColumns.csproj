@@ -11,6 +11,7 @@
     <Company>Łukasz Patalas</Company>
     <Copyright>Copyright (c) 2018 Łukasz Patalas</Copyright>
     <FileVersion>$(ModuleVersion).0</FileVersion>
+    <PreserveCompilationContext>false</PreserveCompilationContext>
     <Version>$(ModuleVersion)</Version>
   </PropertyGroup>
 
@@ -24,6 +25,12 @@
     <PackageReference Include="PowerShellStandard.Library" Version="5.1.0-RC1">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="*.ps*1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

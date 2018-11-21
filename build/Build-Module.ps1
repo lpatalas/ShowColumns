@@ -5,81 +5,86 @@ param(
     [String] $PublishToRepository
 )
 
+$workspaceRoot = Split-Path $PSScriptRoot
 
-$workspaceRoot = Convert-Path (git rev-parse --show-toplevel)
-$scriptsRoot = Join-Path $workspaceRoot 'scripts'
-$projectPath = Join-Path $workspaceRoot 'src' 'ShowColumns' 'ShowColumns.csproj'
-$publishOutputPath = Join-Path $workspaceRoot 'build' 'output' 'publish'
-$modulesRootPath = Join-Path $workspaceRoot 'build' 'output' 'modules'
-$moduleOutputPath = Join-Path $modulesRootPath 'ShowColumns'
-$manifestPath = Join-Path $scriptsRoot 'ShowColumns.psd1'
-$manifest = Get-Content $manifestPath -Raw | Invoke-Expression
-$moduleVersion = $manifest.ModuleVersion
-
-Write-Host "Publishing solution '$projectPath' to '$publishOutputPath'" -ForegroundColor Yellow
-Write-Host "Version: $moduleVersion"
-
-dotnet publish `
-    --configuration Release `
-    --output "$publishOutputPath" `
-    /p:ModuleVersion="$moduleVersion" `
-    "$projectPath"
-
-if ($LASTEXITCODE -ne 0) {
-    throw "dotnet publish exited with error code $LASTEXITCODE"
+function Main {
+    $modulePath = PublishProjectToOutputDirectory
+    CleanupPublishedFiles $modulePath
+    UpdatePreReleaseVersion $modulePath
+    PublishOutputToRepository $modulePath
 }
 
-Write-Host "Copying package contents to '$moduleOutputPath'" -ForegroundColor Yellow
+function PublishProjectToOutputDirectory {
+    $projectPath = Join-Path $workspaceRoot 'src' 'ShowColumns.csproj'
+    $publishOutputPath = Join-Path $workspaceRoot 'build' 'output' 'ShowColumns'
+    $sourceManifestPath = Join-Path $workspaceRoot 'src' 'ShowColumns.psd1'
+    $manifest = Import-PowerShellDataFile -Path $sourceManifestPath
 
-if (Test-Path $moduleOutputPath) {
-    Remove-Item `
-        -Path $moduleOutputPath `
-        -Force `
-        -Recurse `
-        -ErrorAction Stop
-}
+    Write-Host "Publishing solution '$projectPath' to '$publishOutputPath'" -ForegroundColor Cyan
+    Write-Host "Module Version: $($manifest.ModuleVersion)"
 
-New-Item `
-    -Path $moduleOutputPath `
-    -ItemType Directory `
-    -ErrorAction Stop `
-    | Out-Null
-
-$packageFiles = @(
-    Get-ChildItem $publishOutputPath -Filter '*.dll'
-    Get-ChildItem $scriptsRoot
-)
-
-$packageFiles | ForEach-Object {
-    Write-Host "Copying $_"
-    Copy-Item `
-        -Path $_.FullName `
-        -Destination $moduleOutputPath `
-        -Container `
-        -Recurse `
-        -ErrorAction Stop
-}
-
-if ($PreReleaseVersion) {
-    Write-Host "Setting pre-release version to '$PreReleaseVersion'"
-
-    $publishedManifestPath = Join-Path $moduleOutputPath 'ShowColumns.psd1'
-    Update-ModuleManifest `
-        -Path $publishedManifestPath `
-        -Prerelease $PreReleaseVersion
-}
-
-if ($PublishToRepository) {
-    Write-Host "Publishing to repository '$PublishToRepository'" -ForegroundColor Yellow
-
-    $originalModulePath = $env:PSModulePath
-    try {
-        $env:PSModulePath += ";$modulesRootPath"
-        Publish-Module `
-            -Path $moduleOutputPath `
-            -Repository $PublishToRepository
+    if (Test-Path $publishOutputPath) {
+        Write-Host "Removing existing directory: $publishOutputPath"
+        Remove-Item $publishOutputPath -Force -Recurse
     }
-    finally {
-        $env:PSModulePath = $originalModulePath
+
+    dotnet publish `
+        --configuration Release `
+        --output "$publishOutputPath" `
+        /p:ModuleVersion="$moduleVersion" `
+        /p:PreserveCompilationContext="false" `
+        "$projectPath" `
+        | Out-Host
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "dotnet publish exited with error code $LASTEXITCODE"
+    }
+
+    return $publishOutputPath
+}
+
+function CleanupPublishedFiles($publishDirectory) {
+    Write-Host "Cleaning-up directory: $publishDirectory" -ForegroundColor Cyan
+    Get-ChildItem (Join-Path $publishDirectory '*.deps.json') `
+        | ForEach-Object {
+            Write-Host "Removing $_"
+            Remove-Item $_.FullName
+        }
+}
+
+function UpdatePreReleaseVersion($publishDirectory) {
+    if ($PreReleaseVersion) {
+        Write-Host "Setting pre-release version to: $PreReleaseVersion" -ForegroundColor Cyan
+
+        $manifestPath = Join-Path $publishDirectory 'ShowColumns.psd1'
+        Update-ModuleManifest `
+            -Path $manifestPath `
+            -Prerelease $PreReleaseVersion
+    }
+    else {
+        Write-Host "Pre-release version was not specified" -ForegroundColor Cyan
     }
 }
+
+function PublishOutputToRepository($publishDirectory) {
+    if ($PublishToRepository) {
+        Write-Host "Publishing to repository '$PublishToRepository'" -ForegroundColor Cyan
+
+        $originalModulePath = $env:PSModulePath
+        try {
+            $tempModulesPath = Split-Path $publishDirectory
+            $env:PSModulePath += ";$tempModulesPath"
+            Publish-Module `
+                -Path $publishDirectory `
+                -Repository $PublishToRepository
+        }
+        finally {
+            $env:PSModulePath = $originalModulePath
+        }
+    }
+    else {
+        Write-Host 'Skipping publish because repository name was not specified'  -ForegroundColor Cyan
+    }
+}
+
+Main
