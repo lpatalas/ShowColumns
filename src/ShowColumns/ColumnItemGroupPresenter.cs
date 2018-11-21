@@ -46,11 +46,14 @@ namespace ShowColumns
                     if (!isFirstGroup)
                         host.UI.WriteLine();
 
-                    var groupHeaderStyle = groupHeaderStyleSelector(currentGroup);
-                    host.UI.WriteLine(
-                        currentGroup
-                            .ToString()
-                            .WithStyle(groupHeaderStyle));
+                    if (currentGroup != null)
+                    {
+                        var groupHeaderStyle = groupHeaderStyleSelector(currentGroup);
+                        host.UI.WriteLine(
+                            currentGroup
+                                .ToString()
+                                .WithStyle(groupHeaderStyle));
+                    }
                 }
 
                 ColumnsPresenter.WriteColumns(

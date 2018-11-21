@@ -182,3 +182,12 @@ Test 'custom italic and underline colors' {
             -GroupHeaderStyle $groupStyle
 }
 
+Test 'grouping by missing property' {
+    $items = @(
+        @{ Name = 'First' }
+        @{ Name = 'Second' }
+        @{ Name = 'Third' }
+    )
+
+    $items | Show-Columns -Property Name -GroupBy InvalidName
+}
