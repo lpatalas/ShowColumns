@@ -1,5 +1,18 @@
-﻿Import-Module "$PSScriptRoot\ShowColumns.dll"
+﻿
+$pesterExtractPath = Join-Path $PSScriptRoot 'Pester'
+if (-not (Test-Path $pesterExtractPath)) {
+    $pesterArchivePath = Join-Path $PSScriptRoot 'pester.zip'
+    Expand-Archive `
+        -Path $pesterArchivePath `
+        -DestinationPath $pesterExtractPath
+}
 
+Import-Module (Join-Path $pesterExtractPath 'Pester.psd1')
+Import-Module "$PSScriptRoot\ShowColumns.psd1"
+
+Invoke-Pester -Script "$PSScriptRoot\Tests.ps1"
+
+<#
 $CurrentDir = (Split-Path $MyInvocation.MyCommand.Definition)
 $TestsDir = (Join-Path $CurrentDir 'TestData')
 
@@ -191,3 +204,4 @@ Test 'grouping by missing property' {
 
     $items | Show-Columns -Property Name -GroupBy InvalidName
 }
+#>
