@@ -25,11 +25,17 @@ $script:stylePreset = @{
     }
 
     Property = {
+        $name = $(
+            if ($_.PSChildName) { $_.PSChildName }
+            elseif ($_.Name) { $_.Name }
+            else { $_.ToString() }
+        )
+
         if ($_.PSIsContainer) {
-            $_.PSChildName + '/'
+            "$name/"
         }
         else {
-            $_.PSChildName
+            $name
         }
     }
 }
