@@ -44,7 +44,8 @@ namespace ShowColumns
             itemGroupPresenter = new ColumnItemGroupPresenter(
                 Host,
                 groupHeaderStyleSelector,
-                MinimumColumnCount);
+                MinimumColumnCount,
+                new LineWriter(this));
         }
 
         protected override void ProcessRecord()

@@ -12,15 +12,18 @@ namespace ShowColumns
         private readonly PSHost host;
         private bool isFirstGroup = true;
         private readonly int minimumColumnCount;
+        private readonly LineWriter lineWriter;
 
         public ColumnItemGroupPresenter(
             PSHost host,
             TextStyleSelector groupHeaderStyleSelector,
-            int minimumColumnCount)
+            int minimumColumnCount,
+            LineWriter lineWriter)
         {
             this.host = host;
             this.groupHeaderStyleSelector = groupHeaderStyleSelector;
             this.minimumColumnCount = minimumColumnCount;
+            this.lineWriter = lineWriter;
         }
 
         public void Add(ColumnItem item)
@@ -44,22 +47,25 @@ namespace ShowColumns
                 if (currentGroup != NoGroup.Instance)
                 {
                     if (!isFirstGroup)
-                        host.UI.WriteLine();
+                        lineWriter.FinishLine();
 
                     if (currentGroup != null)
                     {
                         var groupHeaderStyle = groupHeaderStyleSelector(currentGroup);
-                        host.UI.WriteLine(
-                            currentGroup
-                                .ToString()
-                                .WithStyle(groupHeaderStyle));
+                        var text = currentGroup
+                            .ToString()
+                            .WithStyle(groupHeaderStyle);
+
+                        lineWriter.Write(text);
+                        lineWriter.FinishLine();
                     }
                 }
 
                 ColumnsPresenter.WriteColumns(
                     host,
                     currentGroupItems,
-                    minimumColumnCount);
+                    minimumColumnCount,
+                    lineWriter);
 
                 currentGroupItems.Clear();
                 isFirstGroup = false;

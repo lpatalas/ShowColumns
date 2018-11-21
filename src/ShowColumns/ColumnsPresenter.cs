@@ -9,7 +9,8 @@ namespace ShowColumns
         public static void WriteColumns(
             PSHost host,
             IReadOnlyList<ColumnItem> items,
-            int minimumColumnCount)
+            int minimumColumnCount,
+            LineWriter lineWriter)
         {
             var columnWidths = GetBestFittingColumnWidths(
                 items,
@@ -30,25 +31,24 @@ namespace ShowColumns
                         var item = items[itemIndex];
 
                         if (columnIndex > 0)
-                            host.UI.Write(" ");
+                            lineWriter.WritePadding(1);
 
                         var displayedName = item.Width <= columnWidth
                             ? item.Name
                             : (item.Name.Substring(0, columnWidth - 3) + "...");
-
-                        host.UI.Write(
+                        
+                        lineWriter.Write(
                             displayedName.WithStyle(item.Style));
 
                         if (columnIndex < (columnCount - 1))
                         {
                             var padding = columnWidth - displayedName.Length;
-                            host.UI.Write(new string(' ', padding));
+                            lineWriter.WritePadding(padding);
                         }
                     }
                 }
 
-                if (host.UI.RawUI.CursorPosition.X > 0)
-                    host.UI.WriteLine();
+                lineWriter.FinishLine();
             }
         }
 
