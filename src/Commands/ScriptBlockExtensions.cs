@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Management.Automation;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal static class ScriptBlockExtensions
     {

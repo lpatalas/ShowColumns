@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Management.Automation;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal delegate object PropertyAccessor(PSObject inputObject);
 

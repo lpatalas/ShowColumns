@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Management.Automation;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     public struct TextStyle
     {

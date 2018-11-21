@@ -1,7 +1,7 @@
 ﻿using System.Management.Automation;
 using System.Text;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal class LineWriter
     {

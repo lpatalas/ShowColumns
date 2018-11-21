@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Management.Automation.Host;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal class ColumnItemGroupPresenter
     {

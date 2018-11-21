@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal static class TextStyleExtensions
     {

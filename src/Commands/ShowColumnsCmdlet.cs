@@ -1,6 +1,6 @@
 ﻿using System.Management.Automation;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     [Cmdlet(VerbsCommon.Show, "Columns")]
     public class ShowColumnsCmdlet : PSCmdlet

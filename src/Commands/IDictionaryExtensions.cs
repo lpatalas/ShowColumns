@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal static class IDictionaryExtensions
     {

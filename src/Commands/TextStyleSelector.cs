@@ -1,6 +1,6 @@
 ﻿using System.Management.Automation;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal delegate TextStyle TextStyleSelector(object inputObject);
 

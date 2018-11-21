@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShowColumns
+namespace ShowColumns.Commands
 {
     internal class ColumnItem : IEquatable<ColumnItem>
     {
