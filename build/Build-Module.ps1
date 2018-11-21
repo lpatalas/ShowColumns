@@ -1,6 +1,10 @@
 param(
+    [ValidatePattern('[a-z]+\d{3}')]
+    [String] $PreReleaseVersion,
+
     [String] $PublishToRepository
 )
+
 
 $workspaceRoot = Convert-Path (git rev-parse --show-toplevel)
 $scriptsRoot = Join-Path $workspaceRoot 'scripts'
@@ -54,6 +58,15 @@ $packageFiles | ForEach-Object {
         -Container `
         -Recurse `
         -ErrorAction Stop
+}
+
+if ($PreReleaseVersion) {
+    Write-Host "Setting pre-release version to '$PreReleaseVersion'"
+
+    $publishedManifestPath = Join-Path $moduleOutputPath 'ShowColumns.psd1'
+    Update-ModuleManifest `
+        -Path $publishedManifestPath `
+        -Prerelease $PreReleaseVersion
 }
 
 if ($PublishToRepository) {
