@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ShowColumns\ShowColumns.csproj" />
+    <ProjectReference Include="..\src\ShowColumns.csproj" />
   </ItemGroup>
 
   <ItemGroup>
