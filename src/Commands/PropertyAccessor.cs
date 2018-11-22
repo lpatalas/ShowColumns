@@ -24,7 +24,7 @@ namespace ShowColumns.Commands
             => obj
                 => obj.BaseObject is IDictionary dictionary
                     ? dictionary[propertyName]
-                    : obj.Properties[propertyName].Value;
+                    : obj.Properties[propertyName]?.Value;
 
         private static PropertyAccessor CreateScriptBlockPropertyAccessor(ScriptBlock scriptBlock)
             => obj

@@ -191,3 +191,13 @@ Test 'grouping by missing property' {
 
     $items | Show-Columns -Property Name -GroupBy InvalidName
 }
+
+Test 'displaying input strings in columns while property name is specified' {
+    $items = @(
+        'First'
+        'Second'
+        'Third'
+    )
+
+    $items | Show-Columns -Property OtherName
+}
