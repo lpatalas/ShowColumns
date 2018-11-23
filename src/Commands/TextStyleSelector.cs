@@ -7,9 +7,13 @@ namespace ShowColumns.Commands
     internal static class TextStyleSelectorFactory
     {
         public static TextStyleSelector Create(object selectorOrValue)
-            => selectorOrValue is ScriptBlock scriptBlock
+        {
+            selectorOrValue = selectorOrValue.UnwrapPSObject();
+
+            return selectorOrValue is ScriptBlock scriptBlock
                 ? CreateScriptBlockSelector(scriptBlock)
                 : CreateConstantSelector(selectorOrValue);
+        }
 
         private static TextStyleSelector CreateScriptBlockSelector(ScriptBlock scriptBlock)
             => inputObject

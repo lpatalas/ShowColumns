@@ -10,6 +10,8 @@ namespace ShowColumns.Commands
     {
         public static PropertyAccessor Create(object propertyNameOrScriptBlock, string parameterName)
         {
+            propertyNameOrScriptBlock = propertyNameOrScriptBlock.UnwrapPSObject();
+
             if (propertyNameOrScriptBlock is string propertyName)
                 return CreateByNamePropertyAccessor(propertyName);
             else if (propertyNameOrScriptBlock is ScriptBlock scriptBlock)
