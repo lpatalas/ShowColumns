@@ -41,6 +41,7 @@ $script:stylePreset = @{
 }
 
 function Show-ChildItemColumns {
+    [CmdletBinding(DefaultParameterSetName = 'Items')]
     param(
         [Alias('PSPath')]
         [Parameter(Mandatory, ParameterSetName = 'LiteralItems', ValueFromPipelineByPropertyName)]
@@ -83,13 +84,40 @@ function Show-ChildItemColumns {
         [switch] $System
     )
 
-    if (($Path.Count -gt 1) -or $Recurse) {
-        Get-ChildItem @PSBoundParameters `
-            | Show-Columns @script:stylePreset `
-                -GroupBy { Convert-Path $_.PSParentPath }
+    begin {
+        $paths = New-Object System.Collections.ArrayList
     }
-    else {
+
+    process {
+        if ($PSCmdlet.ParameterSetName -eq 'LiteralItems') {
+            Write-Verbose "Processing LiteralPath: $LiteralPath"
+            if ($LiteralPath) {
+                $paths.AddRange($LiteralPath)
+            }
+        }
+        else {
+            Write-Verbose "Processing Path: $LiteralPath"
+            if ($Path) {
+                $paths.AddRange($Path)
+            }
+        }
+    }
+
+    end {
+        Write-Verbose "Input item count: $($paths.Count)"
+
+        if ($PSCmdlet.ParameterSetName -eq 'LiteralItems') {
+            $PSBoundParameters['LiteralPath'] = $paths
+        }
+        else {
+            $PSBoundParameters['Path'] = $paths
+        }
+
+        if (($paths.Count -gt 1) -or $Recurse) {
+            $groupBy = { Convert-Path $_.PSParentPath }
+        }
+
         Get-ChildItem @PSBoundParameters `
-            | Show-Columns @script:stylePreset
+            | Show-Columns @script:stylePreset -GroupBy:$groupBy
     }
 }
