@@ -1,7 +1,7 @@
 ---
 external help file: ShowColumns.dll-Help.xml
 Module Name: ShowColumns
-online version:
+online version: https://github.com/lpatalas/ShowColumns/blob/master/docs/Show-Columns.md
 schema: 2.0.0
 ---
 

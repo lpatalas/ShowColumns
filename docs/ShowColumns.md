@@ -1,19 +1,24 @@
 ---
 Module Name: ShowColumns
 Module Guid: 759c4885-0890-4449-9daa-dac88338f114
-Download Help Link: {{Please enter FwLink manually}}
-Help Version: {{Please enter version of help manually (X.X.X.X) format}}
+Download Help Link: https://github.com/lpatalas/ShowColumns/blob/master/docs/ShowColumns.md
+Help Version: 1.0.0.0
 Locale: en-US
 ---
 
 # ShowColumns Module
+
 ## Description
-{{Manually Enter Description Here}}
+
+`ShowColumns` is a module that displays items on screen in columns with optional grouping and dynamic styling.
 
 ## ShowColumns Cmdlets
+
 ### [Show-ChildItemColumns](Show-ChildItemColumns.md)
-{{Manually Enter Show-ChildItemColumns Description Here}}
+
+Calls `Get-ChildItem` with specified parameters and displays results in columns. Can be aliased as `ls` to use as drop-in replacement for `gci`/`dir`/`ls` in interactive sessions.
 
 ### [Show-Columns](Show-Columns.md)
-{{Manually Enter Show-Columns Description Here}}
+
+Displays one property of input objects in autosized columns with optional grouping and styling based on object properties.
 

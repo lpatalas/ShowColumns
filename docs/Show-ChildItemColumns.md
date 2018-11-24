@@ -1,7 +1,7 @@
 ---
 external help file: ShowColumns-help.xml
 Module Name: ShowColumns
-online version:
+online version: https://github.com/lpatalas/ShowColumns/blob/master/docs/Show-ChildItemColumns.md
 schema: 2.0.0
 ---
 
