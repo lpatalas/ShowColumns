@@ -12,6 +12,7 @@ function Main {
     CleanupPublishedFiles $modulePath
     GenerateHelpFiles $modulePath
     UpdatePreReleaseVersion $modulePath
+    RunPSScriptAnalyzer $modulePath
     PublishOutputToRepository $modulePath
 }
 
@@ -69,12 +70,44 @@ function UpdatePreReleaseVersion($publishDirectory) {
         Write-Host "Setting pre-release version to: $PreReleaseVersion" -ForegroundColor Cyan
 
         $manifestPath = Join-Path $publishDirectory 'ShowColumns.psd1'
-        Update-ModuleManifest `
+        $updatedManifestData = Update-ModuleManifest `
             -Path $manifestPath `
-            -Prerelease $PreReleaseVersion
+            -Prerelease $PreReleaseVersion `
+            -PassThru
+
+        # Workaround to set proper psd1 file encoding. Needed because
+        # Update-ModuleManifest always writes file with default encoding
+        $updatedManifestData | Set-Content -Path $manifestPath -Encoding UTF8BOM
     }
     else {
         Write-Host "Pre-release version was not specified" -ForegroundColor Cyan
+    }
+}
+
+function RunPSScriptAnalyzer($publishDirectory) {
+    Write-Host 'Running PSScriptAnalyzer on published project' -ForegroundColor Cyan
+
+    if (-not (Get-Module PSScriptAnalyzer -ErrorAction SilentlyContinue)) {
+        Write-Host 'Importing PSScriptAnalyzer module'
+        Import-Module PSScriptAnalyzer -ErrorAction Stop
+    }
+
+    $allResults = @()
+
+    Get-ChildItem -Path $publishDirectory -Filter '*.ps*1' `
+        | ForEach-Object {
+            Write-Host "Analyzing $($_.FullName)"
+            $results = Invoke-ScriptAnalyzer `
+                -Path $_ `
+                -Severity Warning `
+                -Recurse
+
+            $allResults += @($results)
+        }
+
+    if ($allResults.Count -gt 0) {
+        $allResults | Out-Host
+        throw 'PSScriptAnalyzer returned some errors'
     }
 }
 
