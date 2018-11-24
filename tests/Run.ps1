@@ -1,4 +1,4 @@
-﻿Import-Module "$PSScriptRoot\ShowColumns.dll"
+﻿Import-Module "$PSScriptRoot\ShowColumns.psd1"
 
 $CurrentDir = (Split-Path $MyInvocation.MyCommand.Definition)
 $TestsDir = (Join-Path $CurrentDir 'TestData')
