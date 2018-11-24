@@ -10,6 +10,7 @@ $workspaceRoot = Split-Path $PSScriptRoot
 function Main {
     $modulePath = PublishProjectToOutputDirectory
     CleanupPublishedFiles $modulePath
+    GenerateHelpFiles $modulePath
     UpdatePreReleaseVersion $modulePath
     PublishOutputToRepository $modulePath
 }
@@ -49,6 +50,17 @@ function CleanupPublishedFiles($publishDirectory) {
         | ForEach-Object {
             Write-Host "Removing $_"
             Remove-Item $_.FullName
+        }
+}
+
+function GenerateHelpFiles($publishDirectory) {
+    Write-Host "Generating help files" -ForegroundColor Cyan
+
+    $docsPath = Join-Path $workspaceRoot 'docs'
+
+    New-ExternalHelp -Path $docsPath -OutputPath $publishDirectory -Force `
+        | ForEach-Object {
+            Write-Host "Generated $($_.FullName)"
         }
 }
 
