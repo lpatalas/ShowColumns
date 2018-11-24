@@ -11,7 +11,7 @@ $script:stylePreset = @{
                 '\.(bat|cmd|exe|msi)$' { 'Green' }
                 '\.(bmp|gif|jpg|jpeg|pdn|png|psd|raw|tiff)$' { 'Magenta' }
                 '\.(7z|cab|gz|iso|nupkg|rar|tar|zip)$' { 'Red' }
-                '\.(c|cpp|cs|css|cxx|fs|h|hpp|hs|htm|html|java|js|json|jsx|ps1|psm1|py|sql|toml|ts|tsx|vb|xml|xsl|yml)$' { 'Yellow' }
+                '\.(c|cpp|cs|css|cxx|fs|h|hpp|hs|htm|html|java|js|json|jsx|ps1|psd1|psm1|py|sql|toml|ts|tsx|vb|xml|xsl|yml)$' { 'Yellow' }
                 '\.(csproj|sln|sqlproj|vbproj|vsproj|vsxproj)$' { 'Cyan' }
                 '\.(gitattributes|gitignore|gitmodules|hgignore|hgtags)$' { 'DarkGray' }
                 default { 'Gray' }
