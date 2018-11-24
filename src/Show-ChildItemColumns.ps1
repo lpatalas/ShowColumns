@@ -43,10 +43,10 @@ $script:stylePreset = @{
 function Show-ChildItemColumns {
     param(
         [Alias('PSPath')]
-        [Parameter(Mandatory, ParameterSetName = 'LiteralPath', ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ParameterSetName = 'LiteralItems', ValueFromPipelineByPropertyName)]
         [String] $LiteralPath,
 
-        [Parameter(ParameterSetName = 'Path', Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(ParameterSetName = 'Items', Position = 0, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [String[]] $Path,
 
         [Parameter(Position = 1)]
