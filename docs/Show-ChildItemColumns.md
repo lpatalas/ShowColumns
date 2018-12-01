@@ -13,20 +13,22 @@ Calls `Get-ChildItem` with specified parameters and displays results in columns.
 
 ## SYNTAX
 
+### Items (Default)
+```
+Show-ChildItemColumns [[-Path] <String[]>] [[-Filter] <String>] [-Include <String[]>] [-Exclude <String[]>]
+ [-Recurse] [-Depth <UInt32>] [-Force]
+ [-Attributes <System.Management.Automation.FlagsExpression`1[System.IO.FileAttributes]>] [-FollowSymlink]
+ [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [-GroupHeaderStyle <Object>] [-ItemStyle <Object>]
+ [-Property <Object>] [-GroupBy <Object>] [-AlwaysShowGroups] [<CommonParameters>]
+```
+
 ### LiteralItems
 ```
 Show-ChildItemColumns -LiteralPath <String> [[-Filter] <String>] [-Include <String[]>] [-Exclude <String[]>]
  [-Recurse] [-Depth <UInt32>] [-Force]
  [-Attributes <System.Management.Automation.FlagsExpression`1[System.IO.FileAttributes]>] [-FollowSymlink]
- [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [<CommonParameters>]
-```
-
-### Items
-```
-Show-ChildItemColumns [[-Path] <String[]>] [[-Filter] <String>] [-Include <String[]>] [-Exclude <String[]>]
- [-Recurse] [-Depth <UInt32>] [-Force]
- [-Attributes <System.Management.Automation.FlagsExpression`1[System.IO.FileAttributes]>] [-FollowSymlink]
- [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [<CommonParameters>]
+ [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [-GroupHeaderStyle <Object>] [-ItemStyle <Object>]
+ [-Property <Object>] [-GroupBy <Object>] [-AlwaysShowGroups] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -302,6 +304,86 @@ See `Get-Help Get-ChildItem -Parameter System`.
 Type: SwitchParameter
 Parameter Sets: (All)
 Aliases: as
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AlwaysShowGroups
+
+If specified then group headers are visible even when there is only one group.
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GroupBy
+
+Override default grouping passed to `Show-Columns` cmdlet. For complete documentation see `Get-Help Show-Columns -Parameter GroupBy`.
+
+```yaml
+Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -GroupHeaderStyle
+
+Override default group header style passed to `Show-Columns` cmdlet. For complete documentation see `Get-Help Show-Columns -Parameter GroupHeaderStyle`.
+
+```yaml
+Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -ItemStyle
+
+Override default item style passed to `Show-Columns` cmdlet. For complete documentation see `Get-Help Show-Columns -Parameter ItemStyle`.
+
+```yaml
+Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Property
+
+Override default property passed to `Show-Columns` cmdlet. For complete documentation see `Get-Help Show-Columns -Parameter Property`.
+
+```yaml
+Type: Object
+Parameter Sets: (All)
+Aliases:
 
 Required: False
 Position: Named

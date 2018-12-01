@@ -1,4 +1,4 @@
-$script:stylePreset = @{
+$script:DefaultParameters = @{
     ItemStyle = {
         if ($_.Attributes -match 'Hidden') {
             return @{ Foreground = 'White'; Background = 'DarkGray' }
@@ -38,6 +38,14 @@ $script:stylePreset = @{
             $name
         }
     }
+
+    GroupBy = {
+        Convert-Path $_.PSParentPath
+    }
+}
+
+function Coalesce($a, $b) {
+    if ($a) { $a } else { $b }
 }
 
 function Show-ChildItemColumns {
@@ -81,7 +89,17 @@ function Show-ChildItemColumns {
         [switch] $ReadOnly,
 
         [Alias('as')]
-        [switch] $System
+        [switch] $System,
+
+        [object] $GroupHeaderStyle,
+
+        [object] $ItemStyle,
+
+        [object] $Property,
+
+        [object] $GroupBy,
+
+        [switch] $AlwaysShowGroups
     )
 
     begin {
@@ -106,18 +124,40 @@ function Show-ChildItemColumns {
     end {
         Write-Verbose "Input item count: $($paths.Count)"
 
+        $getChildItemParams = @{
+            Filter = $Filter
+            Include = $Include
+            Exclude = $Exclude
+            Recurse = $Recurse
+            Depth = $Depth
+            Force = $Force
+            Attributes = $Attributes
+            FollowSymlink = $FollowSymlink
+            Directory = $Directory
+            File = $File
+            Hidden = $Hidden
+            ReadOnly = $ReadOnly
+            System = $System
+        }
+
         if ($PSCmdlet.ParameterSetName -eq 'LiteralItems') {
-            $PSBoundParameters['LiteralPath'] = $paths
+            $getChildItemParams['LiteralPath'] = $paths
         }
         else {
-            $PSBoundParameters['Path'] = $paths
+            $getChildItemParams['Path'] = $paths
         }
 
-        if (($paths.Count -gt 1) -or $Recurse) {
-            $groupBy = { Convert-Path $_.PSParentPath }
+        $showColumnsParams = @{
+            GroupHeaderStyle = Coalesce $GroupHeaderStyle $script:DefaultParameters['GroupHeaderStyle']
+            ItemStyle = Coalesce $ItemStyle $script:DefaultParameters['ItemStyle']
+            Property = Coalesce $Property $script:DefaultParameters['Property']
         }
 
-        Get-ChildItem @PSBoundParameters `
-            | Show-Columns @script:stylePreset -GroupBy:$groupBy
+        if ($AlwaysShowGroups -or ($paths.Count -gt 1) -or $Recurse) {
+            $showColumnsParams['GroupBy'] = Coalesce $GroupBy $script:DefaultParameters['GroupBy']
+        }
+
+        Get-ChildItem @getChildItemParams `
+            | Show-Columns @showColumnsParams
     }
 }
