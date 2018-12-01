@@ -22,7 +22,14 @@ CompanyName = 'Łukasz Patalas'
 Copyright = '(c) Łukasz Patalas. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'Displays list of items in columns'
+Description = @"
+`ShowColumns` provides prettier `Get-ChildItem` replacement and ability to display lists of objects in columns.
+
+Available cmdlets are:
+
+* `Show-Columns` - displays any data piped into it in columns with auto-calculated widths.
+* `Show-ChildItemColumns` - invokes `Get-ChildItem` with given parameters and displays results using `Show-Columns`.
+"@
 
 # Minimum version of the PowerShell engine required by this module
 PowerShellVersion = '5.1'
