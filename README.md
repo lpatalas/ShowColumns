@@ -7,6 +7,8 @@ Available cmdlets are:
 * `Show-Columns` - displays any data piped into it in columns with auto-calculated widths.
 * `Show-ChildItemColumns` - invokes `Get-ChildItem` with given parameters and displays results using `Show-Columns`.
 
+## Example
+
 ![Example](./docs/images/animated_example.gif "Example")
 
 ## Installation
