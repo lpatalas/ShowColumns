@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [ValidatePattern('[a-z]+\d{3}')]
     [String] $PreReleaseVersion,
@@ -113,19 +114,10 @@ function RunPSScriptAnalyzer($publishDirectory) {
 
 function PublishOutputToRepository($publishDirectory) {
     if ($PublishToRepository) {
-        Write-Host "Publishing to repository '$PublishToRepository'" -ForegroundColor Cyan
-
-        $originalModulePath = $env:PSModulePath
-        try {
-            $tempModulesPath = Split-Path $publishDirectory
-            $env:PSModulePath += ";$tempModulesPath"
-            Publish-Module `
-                -Path $publishDirectory `
-                -Repository $PublishToRepository
-        }
-        finally {
-            $env:PSModulePath = $originalModulePath
-        }
+        & "$PSScriptRoot\Invoke-Publish.ps1" `
+            -ModulePath $publishDirectory `
+            -RepositoryName $PublishToRepository `
+            -LocalPublish
     }
     else {
         Write-Host 'Skipping publish because repository name was not specified'  -ForegroundColor Cyan
