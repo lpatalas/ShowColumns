@@ -97,9 +97,7 @@ function Show-ChildItemColumns {
 
         [object] $Property,
 
-        [object] $GroupBy,
-
-        [switch] $AlwaysShowGroups
+        [object] $GroupBy
     )
 
     begin {
@@ -153,8 +151,11 @@ function Show-ChildItemColumns {
             Property = Coalesce $Property $script:DefaultParameters['Property']
         }
 
-        if ($AlwaysShowGroups -or ($paths.Count -gt 1) -or $Recurse) {
-            $showColumnsParams['GroupBy'] = Coalesce $GroupBy $script:DefaultParameters['GroupBy']
+        if ($GroupBy) {
+            $showColumnsParams['GroupBy'] = $GroupBy
+        }
+        elseif (($paths.Count -gt 1) -or $Recurse) {
+            $showColumnsParams['GroupBy'] = $script:DefaultParameters['GroupBy']
         }
 
         Get-ChildItem @getChildItemParams `
