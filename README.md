@@ -1,5 +1,7 @@
 # ShowColumns
 
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/ShowColumns.svg)](https://www.powershellgallery.com/packages/ShowColumns)
+
 `ShowColumns` provides prettier `Get-ChildItem` replacement and ability to display lists of objects in columns.
 
 Available cmdlets are:
