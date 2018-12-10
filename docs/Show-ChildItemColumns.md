@@ -18,8 +18,8 @@ Calls `Get-ChildItem` with specified parameters and displays results in columns.
 Show-ChildItemColumns [[-Path] <String[]>] [[-Filter] <String>] [-Include <String[]>] [-Exclude <String[]>]
  [-Recurse] [-Depth <UInt32>] [-Force]
  [-Attributes <System.Management.Automation.FlagsExpression`1[System.IO.FileAttributes]>] [-FollowSymlink]
- [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [-GroupHeaderStyle <Object>] [-ItemStyle <Object>]
- [-Property <Object>] [-GroupBy <Object>] [-AlwaysShowGroups] [<CommonParameters>]
+ [-UseTransaction] [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [-GroupHeaderStyle <Object>]
+ [-ItemStyle <Object>] [-Property <Object>] [-GroupBy <Object>] [<CommonParameters>]
 ```
 
 ### LiteralItems
@@ -27,8 +27,8 @@ Show-ChildItemColumns [[-Path] <String[]>] [[-Filter] <String>] [-Include <Strin
 Show-ChildItemColumns -LiteralPath <String> [[-Filter] <String>] [-Include <String[]>] [-Exclude <String[]>]
  [-Recurse] [-Depth <UInt32>] [-Force]
  [-Attributes <System.Management.Automation.FlagsExpression`1[System.IO.FileAttributes]>] [-FollowSymlink]
- [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [-GroupHeaderStyle <Object>] [-ItemStyle <Object>]
- [-Property <Object>] [-GroupBy <Object>] [-AlwaysShowGroups] [<CommonParameters>]
+ [-UseTransaction] [-Directory] [-File] [-Hidden] [-ReadOnly] [-System] [-GroupHeaderStyle <Object>]
+ [-ItemStyle <Object>] [-Property <Object>] [-GroupBy <Object>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -170,7 +170,7 @@ Accept wildcard characters: False
 
 ### -FollowSymlink
 
-See `Get-Help Get-ChildItem -Parameter FollowSymlink`.
+Only supported on PowerShell Core. On PowerShell Desktop this parameter is ignored. See `Get-Help Get-ChildItem -Parameter FollowSymlink`.
 
 ```yaml
 Type: SwitchParameter
@@ -312,22 +312,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -AlwaysShowGroups
-
-If specified then group headers are visible even when there is only one group.
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -GroupBy
 
 Override default grouping passed to `Show-Columns` cmdlet. For complete documentation see `Get-Help Show-Columns -Parameter GroupBy`.
@@ -382,6 +366,22 @@ Override default property passed to `Show-Columns` cmdlet. For complete document
 
 ```yaml
 Type: Object
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -UseTransaction
+
+Only supported on PowerShell Desktop. On PowerShell Core this parameter is ignored. See `Get-Help Get-ChildItem -Parameter UseTransaction`.
+
+```yaml
+Type: SwitchParameter
 Parameter Sets: (All)
 Aliases:
 

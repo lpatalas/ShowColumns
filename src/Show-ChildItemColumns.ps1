@@ -76,6 +76,8 @@ function Show-ChildItemColumns {
 
         [switch] $FollowSymlink,
 
+        [switch] $UseTransaction,
+
         [Alias('ad', 'd')]
         [switch] $Directory,
 
@@ -130,12 +132,21 @@ function Show-ChildItemColumns {
             Depth = $Depth
             Force = $Force
             Attributes = $Attributes
-            FollowSymlink = $FollowSymlink
             Directory = $Directory
             File = $File
             Hidden = $Hidden
             ReadOnly = $ReadOnly
             System = $System
+        }
+
+        if ($PSEdition -eq 'Desktop') {
+            $getChildItemParams['UseTransaction'] = $UseTransaction
+        }
+        elseif ($PSEdition -eq 'Core') {
+            $getChildItemParams['FollowSymlink'] = $FollowSymlink
+        }
+        else {
+            throw "Unrecognized PSEdition: $PSEdition"
         }
 
         if ($PSCmdlet.ParameterSetName -eq 'LiteralItems') {
