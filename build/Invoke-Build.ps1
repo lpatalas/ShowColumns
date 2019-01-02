@@ -1,3 +1,5 @@
+#Requires -PSEdition Core
+
 [CmdletBinding()]
 param(
     [ValidatePattern('[a-z]+\d{3}')]
@@ -71,14 +73,9 @@ function UpdatePreReleaseVersion($publishDirectory) {
         Write-Host "Setting pre-release version to: $PreReleaseVersion" -ForegroundColor Cyan
 
         $manifestPath = Join-Path $publishDirectory 'ShowColumns.psd1'
-        $updatedManifestData = Update-ModuleManifest `
+        Update-ModuleManifest `
             -Path $manifestPath `
-            -Prerelease $PreReleaseVersion `
-            -PassThru
-
-        # Workaround to set proper psd1 file encoding. Needed because
-        # Update-ModuleManifest always writes file with default encoding
-        $updatedManifestData | Set-Content -Path $manifestPath -Encoding UTF8BOM
+            -Prerelease $PreReleaseVersion
     }
     else {
         Write-Host "Pre-release version was not specified" -ForegroundColor Cyan
@@ -101,7 +98,7 @@ function RunPSScriptAnalyzer($publishDirectory) {
             $results = Invoke-ScriptAnalyzer `
                 -Path $_ `
                 -Severity Warning `
-                -Recurse
+                -Settings PSGallery
 
             $allResults += @($results)
         }
