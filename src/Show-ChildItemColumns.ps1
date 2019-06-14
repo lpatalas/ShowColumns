@@ -44,6 +44,47 @@ $script:DefaultParameters = @{
     }
 }
 
+$script:GetChildItemsParameterNames = @{
+    Desktop = @(
+        'LiteralPath'
+        'Path'
+        'Filter'
+        'Include'
+        'Exclude'
+        'Recurse'
+        'Depth'
+        'Force'
+        'Attributes'
+        'FollowSymlink'
+        'UseTransaction'
+        'Directory'
+        'File'
+        'Hidden'
+        'ReadOnly'
+        'System'
+        'UseTransaction'
+    )
+    Core = @(
+        'LiteralPath'
+        'Path'
+        'Filter'
+        'Include'
+        'Exclude'
+        'Recurse'
+        'Depth'
+        'Force'
+        'Attributes'
+        'FollowSymlink'
+        'UseTransaction'
+        'Directory'
+        'File'
+        'Hidden'
+        'ReadOnly'
+        'System'
+        'FollowSymlink'
+    )
+}
+
 function Coalesce($a, $b) {
     if ($a) { $a } else { $b }
 }
@@ -102,74 +143,28 @@ function Show-ChildItemColumns {
         [object] $GroupBy
     )
 
-    begin {
-        $paths = New-Object System.Collections.ArrayList
-    }
-
-    process {
-        if ($PSCmdlet.ParameterSetName -eq 'LiteralItems') {
-            Write-Verbose "Processing LiteralPath: $LiteralPath"
-            if ($LiteralPath) {
-                $paths.AddRange($LiteralPath)
+    $boundParameters = $PSCmdlet.MyInvocation.BoundParameters
+    $getChildItemParams = @{}
+    $script:GetChildItemsParameterNames[$PSEdition] `
+        | ForEach-Object {
+            if ($boundParameters.ContainsKey($_)) {
+                $getChildItemParams.Add($_, $boundParameters[$_])
             }
         }
-        else {
-            Write-Verbose "Processing Path: $LiteralPath"
-            if ($Path) {
-                $paths.AddRange($Path)
-            }
-        }
+
+    $showColumnsParams = @{
+        GroupHeaderStyle = Coalesce $GroupHeaderStyle $script:DefaultParameters['GroupHeaderStyle']
+        ItemStyle = Coalesce $ItemStyle $script:DefaultParameters['ItemStyle']
+        Property = Coalesce $Property $script:DefaultParameters['Property']
     }
 
-    end {
-        Write-Verbose "Input item count: $($paths.Count)"
-
-        $getChildItemParams = @{
-            Filter = $Filter
-            Include = $Include
-            Exclude = $Exclude
-            Recurse = $Recurse
-            Depth = $Depth
-            Force = $Force
-            Attributes = $Attributes
-            Directory = $Directory
-            File = $File
-            Hidden = $Hidden
-            ReadOnly = $ReadOnly
-            System = $System
-        }
-
-        if ($PSEdition -eq 'Desktop') {
-            $getChildItemParams['UseTransaction'] = $UseTransaction
-        }
-        elseif ($PSEdition -eq 'Core') {
-            $getChildItemParams['FollowSymlink'] = $FollowSymlink
-        }
-        else {
-            throw "Unrecognized PSEdition: $PSEdition"
-        }
-
-        if ($PSCmdlet.ParameterSetName -eq 'LiteralItems') {
-            $getChildItemParams['LiteralPath'] = $paths
-        }
-        else {
-            $getChildItemParams['Path'] = $paths
-        }
-
-        $showColumnsParams = @{
-            GroupHeaderStyle = Coalesce $GroupHeaderStyle $script:DefaultParameters['GroupHeaderStyle']
-            ItemStyle = Coalesce $ItemStyle $script:DefaultParameters['ItemStyle']
-            Property = Coalesce $Property $script:DefaultParameters['Property']
-        }
-
-        if ($GroupBy) {
-            $showColumnsParams['GroupBy'] = $GroupBy
-        }
-        elseif (($paths.Count -gt 1) -or $Recurse) {
-            $showColumnsParams['GroupBy'] = $script:DefaultParameters['GroupBy']
-        }
-
-        Get-ChildItem @getChildItemParams `
-            | Show-Columns @showColumnsParams
+    if ($GroupBy) {
+        $showColumnsParams['GroupBy'] = $GroupBy
     }
+    elseif (($paths.Count -gt 1) -or $Recurse) {
+        $showColumnsParams['GroupBy'] = $script:DefaultParameters['GroupBy']
+    }
+
+    Get-ChildItem @getChildItemParams `
+        | Show-Columns @showColumnsParams
 }
