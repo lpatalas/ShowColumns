@@ -1,6 +1,7 @@
+#Requires -PSEdition Core -Module PowerShellGet
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory, ValueFromPipeline)]
     [String] $ModulePath,
 
     [Parameter(Mandatory)]

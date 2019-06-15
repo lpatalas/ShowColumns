@@ -1,11 +1,8 @@
-#Requires -PSEdition Core
-
+#Requires -PSEdition Core -Module PSScriptAnalyzer
 [CmdletBinding()]
 param(
-    [ValidatePattern('[a-z]+\d{3}')]
-    [String] $PreReleaseVersion,
-
-    [String] $PublishToRepository
+    [ValidateRange('Positive')]
+    [Nullable[Int32]] $PreReleaseNumber
 )
 
 $workspaceRoot = Split-Path $PSScriptRoot
@@ -16,7 +13,9 @@ function Main {
     GenerateHelpFiles $modulePath
     UpdatePreReleaseVersion $modulePath
     RunPSScriptAnalyzer $modulePath
-    PublishOutputToRepository $modulePath
+    Write-Host 'Build succeeded' -ForegroundColor Green
+
+    Get-Item $modulePath
 }
 
 function PublishProjectToOutputDirectory {
@@ -69,13 +68,14 @@ function GenerateHelpFiles($publishDirectory) {
 }
 
 function UpdatePreReleaseVersion($publishDirectory) {
-    if ($PreReleaseVersion) {
-        Write-Host "Setting pre-release version to: $PreReleaseVersion" -ForegroundColor Cyan
+    if ($PreReleaseNumber) {
+        $preReleaseVersion = 'pre{0:000}' -f $PreReleaseNumber
+        Write-Host "Setting pre-release version to: $preReleaseVersion" -ForegroundColor Cyan
 
         $manifestPath = Join-Path $publishDirectory 'ShowColumns.psd1'
         Update-ModuleManifest `
             -Path $manifestPath `
-            -Prerelease $PreReleaseVersion
+            -Prerelease $preReleaseVersion
     }
     else {
         Write-Host "Pre-release version was not specified" -ForegroundColor Cyan
@@ -106,18 +106,6 @@ function RunPSScriptAnalyzer($publishDirectory) {
     if ($allResults.Count -gt 0) {
         $allResults | Out-Host
         throw 'PSScriptAnalyzer returned some errors'
-    }
-}
-
-function PublishOutputToRepository($publishDirectory) {
-    if ($PublishToRepository) {
-        & "$PSScriptRoot\Invoke-Publish.ps1" `
-            -ModulePath $publishDirectory `
-            -RepositoryName $PublishToRepository `
-            -LocalPublish
-    }
-    else {
-        Write-Host 'Skipping publish because repository name was not specified'  -ForegroundColor Cyan
     }
 }
 

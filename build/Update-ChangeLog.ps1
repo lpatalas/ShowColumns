@@ -1,3 +1,4 @@
+#Requires -PSEdition Core
 $workspaceRoot = Split-Path $PSScriptRoot
 $changeLogPath = Join-Path $workspaceRoot 'CHANGELOG.md'
 $releaseNotesPath = Join-Path $workspaceRoot 'docs\release-notes\*.md'
