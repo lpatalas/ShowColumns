@@ -1,4 +1,4 @@
-$script:DefaultParameters = @{
+$DefaultShowColumnsParameters = @{
     ItemStyle = {
         if ($_.Attributes -match 'Hidden') {
             return @{ Foreground = 'White'; Background = 'DarkGray' }
@@ -44,7 +44,7 @@ $script:DefaultParameters = @{
     }
 }
 
-$script:GetChildItemsParameterNames = @{
+$GetChildItemsParameterNames = @{
     Desktop = @(
         'LiteralPath'
         'Path'
@@ -145,7 +145,7 @@ function Show-ChildItemColumns {
 
     $boundParameters = $PSCmdlet.MyInvocation.BoundParameters
     $getChildItemParams = @{}
-    $script:GetChildItemsParameterNames[$PSEdition] `
+    $GetChildItemsParameterNames[$PSEdition] `
         | ForEach-Object {
             if ($boundParameters.ContainsKey($_)) {
                 $getChildItemParams.Add($_, $boundParameters[$_])
@@ -153,16 +153,16 @@ function Show-ChildItemColumns {
         }
 
     $showColumnsParams = @{
-        GroupHeaderStyle = Coalesce $GroupHeaderStyle $script:DefaultParameters['GroupHeaderStyle']
-        ItemStyle = Coalesce $ItemStyle $script:DefaultParameters['ItemStyle']
-        Property = Coalesce $Property $script:DefaultParameters['Property']
+        GroupHeaderStyle = Coalesce $GroupHeaderStyle $DefaultShowColumnsParameters['GroupHeaderStyle']
+        ItemStyle = Coalesce $ItemStyle $DefaultShowColumnsParameters['ItemStyle']
+        Property = Coalesce $Property $DefaultShowColumnsParameters['Property']
     }
 
     if ($GroupBy) {
         $showColumnsParams['GroupBy'] = $GroupBy
     }
     elseif (($paths.Count -gt 1) -or $Recurse) {
-        $showColumnsParams['GroupBy'] = $script:DefaultParameters['GroupBy']
+        $showColumnsParams['GroupBy'] = $DefaultShowColumnsParameters['GroupBy']
     }
 
     Get-ChildItem @getChildItemParams `
