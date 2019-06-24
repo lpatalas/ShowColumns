@@ -1,4 +1,4 @@
-#Requires -PSEdition Core -Module PSScriptAnalyzer
+#Requires -PSEdition Core -Module platyPS, PSScriptAnalyzer
 [CmdletBinding()]
 param(
     [ValidateRange('Positive')]
