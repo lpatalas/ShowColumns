@@ -222,7 +222,7 @@ Specifies property or dynamically calculated value that will be used as object l
 It can be:
 
 * Property name `[String]` - Value of given property is displayed. Example: `Show-Columns -Property 'Name'`.
-* Expression `[ScriptBlock]` - Value returned from given script block is displayed. Input object can be accessed inside script block by using `$_` automatic variable. If returned value is not of type `String` then `ToString()` methos is called on it to get actual label.
+* Expression `[ScriptBlock]` - Value returned from given script block is displayed. Input object can be accessed inside script block by using `$_` automatic variable. If returned value is not of type `String` then `ToString()` method is called on it to get actual label.
 
 ```yaml
 Type: Object
