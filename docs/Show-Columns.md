@@ -14,7 +14,7 @@ Displays one property of input objects in autosized columns with optional groupi
 ## SYNTAX
 
 ```
-Show-Columns -InputObject <PSObject> [-GroupBy <Object>] -Property <Object> [-GroupHeaderStyle <Object>]
+Show-Columns [-Property] <Object> [[-GroupBy] <Object>] -InputObject <PSObject> [-GroupHeaderStyle <Object>]
  [-ItemStyle <Object>] [-MinimumColumnCount <Int32>] [<CommonParameters>]
 ```
 
@@ -131,7 +131,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: False
-Position: Named
+Position: 1
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
@@ -230,7 +230,7 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
-Position: Named
+Position: 0
 Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False

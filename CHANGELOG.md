@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.2.3 (2019-06-24)
+
+- **CHANGE**: Made `-Property` and `-Group` parameters positional.
+- **BUGFIX**: Fixed typo in documentation of `Show-Columns` `-Property` parameter.
+
 ## 0.2.2 (2019-06-15)
 
 - **BUGFIX**: Calling `Get-ChildItemColumns` with `-Path` parameter set to wildcard sometimes caused the function to enumerate child directories recursively as if `-Depth 0` has been specified. Now it behaves the same as standard `Get-ChildItems` cmdlet.

@@ -14,10 +14,10 @@ namespace ShowColumns.Commands
         [Parameter(Mandatory = true, ValueFromPipeline = true)]
         public PSObject InputObject { get; set; }
 
-        [Parameter]
+        [Parameter(Position = 1)]
         public object GroupBy { get; set; }
 
-        [Parameter(Mandatory = true)]
+        [Parameter(Mandatory = true, Position = 0)]
         public object Property { get; set; }
 
         [Parameter]
