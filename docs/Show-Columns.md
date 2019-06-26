@@ -14,7 +14,7 @@ Displays one property of input objects in autosized columns with optional groupi
 ## SYNTAX
 
 ```
-Show-Columns [-Property] <Object> [[-GroupBy] <Object>] -InputObject <PSObject> [-GroupHeaderStyle <Object>]
+Show-Columns [[-Property] <Object>] [[-GroupBy] <Object>] -InputObject <PSObject> [-GroupHeaderStyle <Object>]
  [-ItemStyle <Object>] [-MinimumColumnCount <Int32>] [<CommonParameters>]
 ```
 
@@ -217,7 +217,7 @@ Accept wildcard characters: False
 
 ### -Property
 
-Specifies property or dynamically calculated value that will be used as object labels.
+Specifies property or dynamically calculated value that will be used as object labels. If this parameter is omitted then `ToString()` is called on each input item to get label.
 
 It can be:
 
@@ -229,7 +229,7 @@ Type: Object
 Parameter Sets: (All)
 Aliases:
 
-Required: True
+Required: False
 Position: 0
 Default value: None
 Accept pipeline input: False

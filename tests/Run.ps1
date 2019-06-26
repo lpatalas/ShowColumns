@@ -201,3 +201,13 @@ Test 'displaying input strings in columns while property name is specified' {
 
     $items | Show-Columns -Property OtherName
 }
+
+Test 'displaying input items as strings without specifying Property parameter' {
+    $items = @(
+        'First'
+        'Second'
+        'Third'
+    )
+
+    $items | Show-Columns
+}

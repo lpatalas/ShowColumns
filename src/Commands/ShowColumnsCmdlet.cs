@@ -17,7 +17,7 @@ namespace ShowColumns.Commands
         [Parameter(Position = 1)]
         public object GroupBy { get; set; }
 
-        [Parameter(Mandatory = true, Position = 0)]
+        [Parameter(Position = 0)]
         public object Property { get; set; }
 
         [Parameter]
@@ -37,9 +37,13 @@ namespace ShowColumns.Commands
                 ? PropertyAccessorFactory.Create(GroupBy, nameof(GroupBy))
                 : _ => NoGroup.Instance;
 
+            itemNamePropertyAccessor
+                = Property != null
+                ? PropertyAccessorFactory.Create(Property, nameof(Property))
+                : PropertyAccessorFactory.ToStringAccessor;
+
             groupHeaderStyleSelector = TextStyleSelectorFactory.Create(GroupHeaderStyle);
             itemStyleSelector = TextStyleSelectorFactory.Create(ItemStyle);
-            itemNamePropertyAccessor = PropertyAccessorFactory.Create(Property, nameof(Property));
 
             itemGroupPresenter = new ColumnItemGroupPresenter(
                 Host,

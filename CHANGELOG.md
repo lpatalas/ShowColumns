@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.2.4 (2019-06-26)
+
+- **CHANGE**: Made `-Property` parameter optional. If not specified then `ToString()` method
+  is called on each input item to get presented label.
+
 ## 0.2.3 (2019-06-24)
 
 - **CHANGE**: Made `-Property` and `-Group` parameters positional.

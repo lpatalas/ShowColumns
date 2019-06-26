@@ -8,6 +8,9 @@ namespace ShowColumns.Commands
 
     internal static class PropertyAccessorFactory
     {
+        public static readonly PropertyAccessor ToStringAccessor
+            = obj => obj?.ToString() ?? string.Empty;
+
         public static PropertyAccessor Create(object propertyNameOrScriptBlock, string parameterName)
         {
             propertyNameOrScriptBlock = propertyNameOrScriptBlock.UnwrapPSObject();
