@@ -185,7 +185,7 @@ It can be:
 * Console color name `[String]` - foreground is set to given color. Example: `Show-Columns -ItemStyle 'Yellow'`.
 * Console color `[ConsoleColor]` - foreground is set to given `ConsoleColor`. Example: `Show-Columns -ItemStyle ([ConsoleColor]::Yellow)`.
 * Text style `[Hashtable]` - text style is defined by `Foreground`, `Background` and `Underline` keys in given hashtable. Example: `Show-Columns -ItemStyle @{ Foreground = 'Red'; Background = 'Gray'; Underline = $true }`.
-* Script block `[ScriptBlock]` - expression that received input object as `$_` automatic variable and returns one of above values to set item style. Example: `Show-Columns -ItemStyle { if ($_.PSIsContainer) { 'Blue' } else { 'Gray' } }`.
+* Script block `[ScriptBlock]` - expression that receives input object as `$_` automatic variable and returns one of above values to set item style. Example: `Show-Columns -ItemStyle { if ($_.PSIsContainer) { 'Blue' } else { 'Gray' } }`.
 
 ```yaml
 Type: Object
@@ -249,7 +249,7 @@ You can pipe any object into this command.
 
 ### System.Object
 
-This command returns no output.
+This cmdlet returns no output.
 
 ## NOTES
 

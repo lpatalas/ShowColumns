@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.5 (2021-02-27)
+
+- **BUGFIX**: Minor fixes in documentation of `Show-Columns` cmdlet.
+
 ## 0.2.4 (2019-06-26)
 
 - **CHANGE**: Made `-Property` parameter optional. If not specified then `ToString()` method
