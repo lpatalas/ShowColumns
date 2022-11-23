@@ -112,37 +112,13 @@ Test 'displaying long items with explicit minimum column count' {
     $items | Show-Columns -Property Name -MinimumColumnCount 3
 }
 
-Test 'custom colors' {
-    $itemStyleSelector = {
-        switch -regex ($_.Name) {
-            '1' { [ConsoleColor]::Red }
-            '2' { [ConsoleColor]::Blue }
-            '3' { [ConsoleColor]::Green }
-        }
-    }
-
-    $groupStyleSelector = {
-        switch -regex ($_) {
-            '1$' { [ConsoleColor]::Red }
-            '2$' { [ConsoleColor]::Blue }
-            '3$' { [ConsoleColor]::Green }
-        }
-    }
-
-    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
-        | Show-Columns `
-            -Property Name `
-            -GroupBy { Convert-Path $_.PSParentPath } `
-            -ItemStyle $itemStyleSelector `
-            -GroupHeaderStyle $groupStyleSelector
-}
-
-Test 'custom styles colors' {
+Test 'custom colors using ConsoleColor enum' {
     $itemStyleSelector = {
         switch -regex ($_.Name) {
             '1' { @{ Foreground = [ConsoleColor]::Red } }
-            '2' { @{ Foreground = [ConsoleColor]::Blue; Background = [ConsoleColor]::DarkCyan } }
-            '3' { @{ Foreground = [ConsoleColor]::Green; Background = [ConsoleColor]::DarkGreen } }
+            '2' { @{ Foreground = [ConsoleColor]::Blue; Background = [ConsoleColor]::Green } }
+            '3' { @{ Foreground = [ConsoleColor]::Green; Background = [ConsoleColor]::Blue } }
+            '3' { @{ Underline = $true } }
         }
     }
 
@@ -160,10 +136,31 @@ Test 'custom styles colors' {
             -GroupHeaderStyle $groupStyle
 }
 
-Test 'custom italic and underline colors' {
+Test 'custom colors using ANSI escape codes' {
+    $esc = [char]0x1b
+
     $itemStyleSelector = {
         switch -regex ($_.Name) {
-            '1' { @{ Foreground = [ConsoleColor]::Red; Italic = $true } }
+            '1' { "$esc[91m" } # red
+            '2' { "$esc[94;102m" } # blue foreground / green background
+            '3' { "$esc[92m$esc[104m" } # green foreground / blue background (separate sequences)
+        }
+    }
+
+    $groupStyle = "$esc[91;45;4m" # red foreground / dark magenta background / underline
+
+    Get-ChildItem "$TestsDir\Subfolders" -Recurse `
+        | Show-Columns `
+            -Property Name `
+            -GroupBy { Convert-Path $_.PSParentPath } `
+            -ItemStyle $itemStyleSelector `
+            -GroupHeaderStyle $groupStyle
+}
+
+Test 'custom colors and underline' {
+    $itemStyleSelector = {
+        switch -regex ($_.Name) {
+            '1' { @{ Foreground = [ConsoleColor]::Red; Underline = $true } }
             '2' { @{ Foreground = [ConsoleColor]::Blue; Background = [ConsoleColor]::DarkCyan } }
             '3' { @{ Foreground = [ConsoleColor]::Green; Background = [ConsoleColor]::DarkGreen } }
         }

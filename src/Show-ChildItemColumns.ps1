@@ -1,24 +1,4 @@
 $DefaultShowColumnsParameters = @{
-    ItemStyle = {
-        if ($_.Attributes -match 'Hidden') {
-            return @{ Foreground = 'White'; Background = 'DarkGray' }
-        }
-        elseif ($_.PSIsContainer) {
-            return 'Blue'
-        }
-        else {
-            switch -Regex ($_.Extension) {
-                '\.(bat|cmd|exe|msi)$' { 'Green' }
-                '\.(bmp|gif|jpg|jpeg|pdn|png|psd|raw|tiff)$' { 'Magenta' }
-                '\.(7z|cab|gz|iso|nupkg|rar|tar|zip)$' { 'Red' }
-                '\.(c|cpp|cs|css|cxx|fs|h|hpp|hs|htm|html|java|js|json|jsx|ps1|psd1|psm1|py|sql|toml|ts|tsx|vb|xml|xsl|yml)$' { 'Yellow' }
-                '\.(csproj|sln|sqlproj|vbproj|vsproj|vsxproj)$' { 'Cyan' }
-                '\.(gitattributes|gitignore|gitmodules|hgignore|hgtags)$' { 'DarkGray' }
-                default { 'Gray' }
-            }
-        }
-    }
-
     GroupHeaderStyle = @{
         Foreground = [ConsoleColor]::DarkGray
         Underline = $true
@@ -41,6 +21,43 @@ $DefaultShowColumnsParameters = @{
 
     GroupBy = {
         Convert-Path $_.PSParentPath
+    }
+}
+
+if ($PSStyle) {
+    $DefaultShowColumnsParameters['ItemStyle'] = {
+        if ($_.PSIsContainer) {
+            return $PSStyle.FileInfo.Directory
+        }
+        else {
+            if ($_.Extension) {
+                return $PSStyle.FileInfo.Extension[$_.Extension]
+            }
+            else {
+                return ''
+            }
+        }
+    }
+}
+else {
+    $DefaultShowColumnsParameters['ItemStyle'] = {
+        if ($_.Attributes -match 'Hidden') {
+            return @{ Foreground = 'White'; Background = 'DarkGray' }
+        }
+        elseif ($_.PSIsContainer) {
+            return 'Blue'
+        }
+        else {
+            switch -Regex ($_.Extension) {
+                '\.(bat|cmd|exe|msi)$' { 'Green' }
+                '\.(bmp|gif|jpg|jpeg|pdn|png|psd|raw|tiff)$' { 'Magenta' }
+                '\.(7z|cab|gz|iso|nupkg|rar|tar|zip)$' { 'Red' }
+                '\.(c|cpp|cs|css|cxx|fs|h|hpp|hs|htm|html|java|js|json|jsx|ps1|psd1|psm1|py|sql|toml|ts|tsx|vb|xml|xsl|yml)$' { 'Yellow' }
+                '\.(csproj|sln|sqlproj|vbproj|vsproj|vsxproj)$' { 'Cyan' }
+                '\.(gitattributes|gitignore|gitmodules|hgignore|hgtags)$' { 'DarkGray' }
+                default { 'Gray' }
+            }
+        }
     }
 }
 
