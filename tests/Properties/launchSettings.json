@@ -2,7 +2,7 @@
   "profiles": {
     "PowerShellCore": {
       "commandName": "Executable",
-      "executablePath": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+      "executablePath": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
       "commandLineArgs": "-ExecutionPolicy RemoteSigned -NoExit -NoLogo -NoProfile -File \"$(OutputDir)Run.ps1\"",
       "workingDirectory": "$(OutputDir)"
     },
